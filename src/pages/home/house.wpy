@@ -1,0 +1,158 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  .require {
+    margin-bottom: 10px;
+    color: red;
+  }
+</style>
+
+<template>
+  <div class="cu-bar bg-white solid-bottom">
+    <div class="action">
+      <div class="cuIcon-title text-blue h2">
+        <text>发布房源</text>
+      </div>
+    </div>
+  </div>
+
+  <div class="cu-form-group margin-top">
+    <div class="title">
+      标题
+      <span class="require">*</span>
+    </div>
+    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="简单介绍一下"/>
+  </div>
+
+  <div class="cu-form-group align-start">
+    <div class="title">简介</div>
+    <textarea placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..."></textarea>
+  </div>
+
+  <div class="cu-form-group margin-top">
+    <div class="title text-black">
+      地址
+      <span class="require">*</span>
+    </div>
+    <input disabled="true" placeholder="选择地点或者小区"/>
+    <div class="action">
+      <div class="cuIcon-right"></div>
+    </div>
+  </div>
+
+  <div class="cu-form-group">
+    <div class="title">
+      <div>
+        租金
+        <span class="require">*</span>
+      </div>
+    </div>
+    <input name="rent" placeholder="租金需少于6位数" type="number"/>
+    <div class="action">
+      <text>元/月</text>
+    </div>
+  </div>
+
+  <div class="cu-form-group">
+    <div class="title">
+      户型
+      <span class="require">*</span>
+    </div>  
+    <input name="rooms" type="number" :style="{width: '10px', textAlign: 'center'}"/>
+    室
+    <input name="livings" type="number" :style="{width: '10px', textAlign: 'center'}"/>
+    厅
+    <input name="toilets" type="number" :style="{width: '10px', textAlign: 'center'}"/>
+    卫
+  </div>
+
+  <div class="cu-form-group">
+    <div class="title">
+      类型
+      <span class="require">*</span>  
+    </div>
+    <picker bindchange="setLeaseType" value="{{leaseTypeIndex}}" range="{{leaseType}}">
+      <div class="picker">
+        出租类型
+      </div>
+    </picker>
+  </div>
+
+  <div class="cu-form-group">
+    <div class="title">
+      <div>
+        付款
+        <span class="require">*</span>
+      </div>
+    </div>
+    
+    <picker bindchange="setPaymentType" value="{{paymentTypeIndex}}" range="{{paymentType}}">
+      <div class="picker">
+        {{paymentTypeIndex ? paymentType[paymentTypeIndex] : "付款方式" }}
+      </div>
+    </picker>
+  
+  </div>
+
+  <div class="cu-form-group">
+    <div class="title">
+      已入住
+      <span class="require">*</span>
+    </div>
+    <input name="tenant" style="width: 50rpx" type="number"/>
+    <div class="action">
+      人
+    </div>
+  </div>
+
+
+  <div class="cu-bar bg-white margin-top">
+    <div class="action">
+      图片上传
+    </div>
+    <div class="action">
+      {{images.length}}/9
+    </div>
+  </div>
+
+  <div class="cu-form-group">
+    <div class="grid col-4 grid-square flex-sub">
+      <div class="bg-img" v-for="(item,index) in images" :key="index" @tap="ViewImage" :data-url="images[index]">
+       <image :src="images[index]" mode="aspectFill"></image>
+        <div class="cu-tag bg-red" @tap.stop="DelImg" :data-index="index">
+          <text class="cuIcon-close"></text>
+        </div>
+      </div>
+      <div class="solids" @tap="chooseImage" v-if="images.length<9">
+        <text class="cuIcon-cameraadd"></text>
+      </div>
+    </div>
+  </div>
+
+  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">提交</button>
+</template>
+
+<script>
+  import wepy from '@wepy/core'
+
+  wepy.page({
+    data: {
+      images: []
+    },
+    onLoad() {
+
+    }
+  });
+</script>
+
+<config>
+  {
+    navigationBarTitleText: '绑定手机',
+    usingComponents: {
+
+    }
+  }
+</config>

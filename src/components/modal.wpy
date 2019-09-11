@@ -1,0 +1,69 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+</style>
+
+<template>
+  <div class="cu-modal" :class="{'show': show}">
+    <div class="cu-dialog">
+      <div class="cu-bar bg-white justify-end">
+        <div class="content">{{title}}</div>
+        <div class="action">
+          <div class="cuIcon-close text-red" @tap="close">
+            <span></span>
+          </div>
+        </div>
+      </div>
+      <div class="padding-xl">
+        {{body}}
+      </div>
+      <div class="cu-bar bg-white justify-end">
+        <div class="action">
+          <div class="cu-btn line-green text-green" @tap="close">
+            取消
+          </div>
+          <div class="cu-btn bg-green margin-left" @tap="confirm">
+            确定
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import wepy from "@wepy/core"
+  import eventHub from '../common/eventHub';
+
+  wepy.component({
+    props: {
+      show: {
+        type: Boolean,
+        default: false,
+        twoWay: true,
+      },
+      title: String,
+      body: String,
+      confirmEvent: String
+    },
+
+    methods: {
+      close(e) {
+        eventHub.$emit('modal-close')
+      },
+      confirm(e) {
+        eventHub.$emit('modal-confirm')
+      }
+    }
+  })
+</script>
+
+<config>
+  {
+    usingComponents: {
+
+    }
+  }
+</config>

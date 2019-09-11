@@ -1,0 +1,114 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+</style>
+
+<template>  
+  <div class="cu-bar bg-white solid-bottom">
+    <div class="action">
+      <span class="cuIcon-title text-orange "/>
+      黑名单
+    </div>
+  </div>
+
+  <div class="cu-list menu-avatar margin-top-sm">
+    <div class="cu-item" :class="{ 'move-cur': (slideId==index)}" v-for="(item, index) in blacklist" :key="index" @touchstart="ListTouchStart" @touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="index">
+      <div class="cu-avatar round lg" :style="{backgroundImage:'url(https://ossweb-img.qq.com/images/lol/web201310/skin/big2100'+ (index+2) +'.jpg)'}"></div>
+      <div class="content">
+        <div class="text-grey">
+          {{item.username}}
+          <span class="iconfont {{item.gender == 'male' ? 'icon-male text-blue' : 'icon-female text-red'}}" />
+          <span class="cu-tag radius {{item.gender == 'male' ? 'line-blue' : 'line-red'}} sm" :style="{fontSize: '13px'}">{{item.age}}</span>
+        </div>
+        <div class="text-gray text-sm">
+          {{item.last_msg}}
+        </div>
+      </div>
+      <div class="action">
+        <span class="text-grey iconfont icon-setting" @tap="tapSetting" :data-target="index"/>
+      </div>
+      <div class="move">
+        <div class="bg-red">取消黑名单</div>
+      </div>
+    </div>
+  </div>
+
+</template>
+
+<script>
+  import wepy from '@wepy/core'
+
+  wepy.page({
+    data: {
+      slideId: null,
+      listTouchStart: 0,
+      listTouchDirection: null,
+      blacklist: [
+        {
+          id: 1,
+          username: '静香',
+          timestamp: '22:10',
+          gender: 'female',
+          age: '21',
+          last_msg: '你在哪里?'
+        },
+        {
+          id: 2,
+          username: '树上的糯米鸡',
+          timestamp: '22:10',
+          gender: 'male',
+          age: '31',
+          last_msg: '出来喝酒啊!'
+        },
+        {
+          id: 3,
+          username: '大雄',
+          timestamp: '22:10',
+          gender: 'male',
+          age: '23',
+          last_msg: '你这是欺负我大雄?'
+        }
+      ]
+    },
+    onLoad() {
+
+    },
+
+    methods: {
+      tapSetting(e) {
+        this.slideId = e.currentTarget.dataset.target
+      },
+
+      ListTouchStart(e) {
+        this.listTouchStart = e.touches[0].pageX
+      },
+
+      // ListTouch计算方向
+      ListTouchMove(e) {
+        this.listTouchDirection = e.touches[0].pageX - this.listTouchStart > 0 ? 'right' : 'left'
+      },
+
+      // ListTouch计算滚动
+      ListTouchEnd(e) {
+        if (this.listTouchDirection == 'left') {
+          this.slideId = e.currentTarget.dataset.target
+        } else {
+          this.slideId = null
+        }
+        this.listTouchDirection = null
+      }
+    }
+  });
+</script>
+
+<config>
+  {
+    navigationBarTitleText: '多度找室友',
+    usingComponents: {
+
+    }
+  }
+</config>

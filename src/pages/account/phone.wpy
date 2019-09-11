@@ -1,0 +1,67 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  .require {
+    margin-bottom: 10px;
+    color: red;
+  }
+</style>
+
+<template>
+  <div class="cu-bar bg-white solid-bottom">
+    <div class="action">
+      <div class="cuIcon-title text-blue h2">
+        <text>绑定手机号</text>
+      </div>
+    </div>
+  </div>
+
+  <div class="cu-form-group margin-top-sm">
+    <div class="title">
+      手机号码
+      <span class="require">*</span>
+    </div>
+
+    <input type="text" placeholder="请填写手机号码"/>
+    <div class="cu-capsule radius">
+      <span class="cu-tag bg-blue ">+86</span>
+      <span class="cu-tag line-blue">中国大陆</span>
+    </div>
+  </div>
+
+  <div class="cu-form-group">
+    <div class="title">
+      验证码
+      <span class="require">*</span>
+    </div>    
+    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="验证码"/>
+    <button class="cu-btn bg-green shadow">验证码</button>
+  </div>
+
+  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">提交</button>
+</template>
+
+<script>
+  import wepy from '@wepy/core'
+
+  wepy.page({
+    data: {
+
+    },
+    onLoad() {
+
+    }
+  });
+</script>
+
+<config>
+  {
+    navigationBarTitleText: '绑定手机',
+    usingComponents: {
+
+    }
+  }
+</config>

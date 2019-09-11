@@ -1,0 +1,40 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+</style>
+
+<template>
+  <div class="cu-list grid col-4">
+    <div class="cu-item" v-for="item in list">
+      <div class="iconfont text-{{item.iconColor}} icon-{{item.icon}}" :style="{fontSize: item.fontSize + 'px' }"/>
+      <div :style="{marginTop: '5px'}">
+        <span>{{item.text}}</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import wepy from "@wepy/core"
+  import eventHub from '../common/eventHub';
+  wepy.component({
+    props: {
+      list: Object
+    },
+    methods: {
+      tapHandler: function(e) {
+        console.log(e);
+      }
+    }
+  })
+</script>
+
+<config>
+  {
+    usingComponents: {
+
+    }
+  }
+</config>

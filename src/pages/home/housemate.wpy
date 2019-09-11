@@ -1,0 +1,110 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  .require {
+    margin-bottom: 10px;
+    color: red;
+  }
+</style>
+
+<template>
+  <div>
+    <div class="cu-bar bg-white solid-bottom">
+      <div class="action">
+        <div class="cuIcon-title text-blue h2">
+          <text>发帖找室友</text>
+        </div>
+      </div>
+    </div>
+
+    <div class="cu-form-group margin-top">
+      <div class="title">
+        标题
+        <span class="require">*</span>
+      </div>
+      <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="简单介绍一下"/>
+    </div>
+
+    <div class="cu-form-group">
+      <div class="title text-black">
+        位置
+        <span class="require">*</span>
+      </div>
+      <input disabled="true" placeholder="选择地点或者小区">
+      <div class="action">
+        <div class="cuIcon-right text-grey"></div>
+      </div>
+    </div>
+
+
+    <div class="cu-form-group">
+      <div class="title">
+        范围
+      </div>
+      <select>
+        <div>
+          <div class="picker">
+            3km
+          </div>
+        </div>
+      </select>
+    </div>
+
+    <div class="cu-form-group">
+      <div class="title">入住时间</div>
+      <picker mode="date" :value="availableFrom" :start="now">
+        <div class="picker">{{availableFrom || now}}</div>
+      </picker>
+    </div>
+
+    <div class="cu-form-group">
+      <div class="title">
+        租金范围
+      </div>
+      <input name="min_rent" type="number" placeholder="最低" :style="{width: '20px', textAlign: 'center'}"/>
+      -
+      <input name="max_rent" type="number" placeholder="最高" :style="{width: '20px', textAlign: 'center'}"/>
+      <div class="footer">
+        元/月
+      </div>
+    </div>
+
+    <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">
+      提交
+    </button>
+  </div>
+</template>
+
+<script>
+  import wepy from '@wepy/core'
+
+  wepy.page({
+    data: {
+      availableFrom: null
+    },
+    computed: {
+      now() {
+        let date = new Date
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        return [year, "0" + month, day].join('-')
+      }
+    },
+    onLoad() {
+
+    }
+  });
+</script>
+
+<config>
+  {
+    navigationBarTitleText: '绑定手机',
+    usingComponents: {
+
+    }
+  }
+</config>

@@ -1,0 +1,33 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+</style>
+
+<template>
+  <text>activity</text>
+</template>
+
+<script>
+  import wepy from '@wepy/core'
+
+  wepy.page({
+    data: {
+
+    },
+
+    methods: {
+
+    },
+    onLoad() {
+    }
+  });
+</script>
+<config>
+  {
+    navigationBarTitleText: '多度找室友',
+    usingComponents: {
+    }
+  }
+</config>

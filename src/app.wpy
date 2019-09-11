@@ -1,0 +1,144 @@
+<style lang="less">
+  .thumb {
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px solid #D0A475;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  }
+  .h2 text {
+    font-size: 16px;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: row
+  }
+
+  .input-group .cuIcon[class*="cuIcon-"]{
+    background-color: #eee;
+  }
+
+  .input-group.sm{
+    height: 25px;
+  }
+
+</style>
+
+<script>
+  import wepy from '@wepy/core';
+  import eventHub from './common/eventHub';
+  import vuex from '@wepy/x';
+  import { userMapping } from './common/utils';
+  import { authenticate } from './common/api';
+  import promisify  from '@wepy/use-promisify';
+
+  wepy.use(vuex);
+  wepy.use(promisify);
+
+  wepy.app({
+    
+    data: {
+
+    },
+
+    onLaunch() {
+      // event hanlder
+      eventHub.$on('sync-user', (userInfo, $event) => {
+
+      });
+
+      eventHub.$on('wx-error', (err) => {
+        console.log(err);
+      });
+
+      eventHub.$on('open-setting', () => {
+        wepy.wx.openSetting().catch((err) => {
+          this.$emit('wx-error', err);
+        })
+      });
+
+      eventHub.$on('auth-user', () => {
+        authenticate().then((res) => {
+          wepy.wx.setStorage({
+            key: 'accessToken',
+            value: res.header["Authorization"]
+          }).catch((err) => {
+            eventHub.$emit('wx-error', err);
+          })
+        });
+      });
+
+      authenticate();
+    },
+
+    methods: {
+
+    }
+
+  });
+</script>
+
+<config>
+{
+  pages: [
+    'pages/home',
+    'pages/account',
+    'pages/activity',
+    'pages/message',
+  ],
+  subPackages:[
+    {
+      root: 'pages/home',
+      pages: ['housemate', 'house', 'cities']
+    },
+    {
+      root: 'pages/account',
+      pages: [ 'email', 'phone', 'profile']
+    },
+    {
+      root: 'pages/share/',
+      pages: ['authorize']
+    }
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#fff',
+    navigationBarTextStyle: 'black'
+  },
+  tabBar: {
+    selectedColor: "#33A6B8",
+    list: [
+      {
+        pagePath: "pages/home",
+        text: "首页",
+        iconPath: "./assets/images/home.png",
+        selectedIconPath: "./assets/images/home_selected.png"
+      },
+      {
+        pagePath: "pages/activity",
+        text: "活动",
+        iconPath: "./assets/images/activity.png",
+        selectedIconPath: "./assets/images/activity_selected.png"
+      },
+      {
+        pagePath: "pages/message",
+        text: "消息",
+        iconPath: "./assets/images/message.png",
+        selectedIconPath: "./assets/images/message_selected.png"
+      },
+      {
+        pagePath: "pages/account",
+        text: "我的",
+        iconPath: "./assets/images/me.png",
+        selectedIconPath: "./assets/images/me_selected.png"
+      }
+    ]
+  },
+}
+</config>

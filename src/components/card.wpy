@@ -1,0 +1,85 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+</style>
+
+<template>
+  <div class="cu-card case">
+    <div v-for="(post, index) in posts" class="cu-item shadow">
+      <div class="image">
+        <div style="height: 187.561px;">
+          <div style="background-size: 100% 100%; background-repeat: no-repeat; background-image: url({{post.attachments[0].url}});"></div>
+          <img src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg">
+        </div>
+        <div class="cu-tag bg-blue">{{post.rent_type}}</div>
+        <div class="cu-bar bg-shadeBottom">
+          <div class="text-cut">
+            <span>
+              {{post.title}}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="cu-list menu-avatar">
+        <div class="cu-item">
+           <div class="cu-avatar round lg" style="background-image: url({{post.user.avatar}});"/>
+          <div class="content flex-sub">
+            <div class="text-grey">
+              {{post.user.username}}
+              <span class="{{post.user.gender == 'male' ? 'cuIcon-male text-blue' : 'cuIcon-female text-red'}}"/>
+            </div>
+            <div class="text-gray text-sm flex justify-between">
+              {{post.timestamp}}
+              <div class="text-sm">
+                <span class="iconfont icon-livings margin-lr-xs text-blue"/>
+                {{post.livings}}
+                <span class="iconfont icon-bedrooms margin-lr-xs text-blue"/>
+                {{post.bedrooms}}
+                <span class="iconfont icon-toilets margin-lr-xs text-blue"/>
+                {{post.toilets}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer padding-lr padding-tb-sm solid-top" >
+        <div class="flex justify-between align-center">
+          <div class="location text-sm text-blue">
+            <span class="iconfont icon-location" :style="{fontSize: '14px'}"></span>
+            {{post.address}}
+          </div>
+          <div class="action flex text-sm text-gray align-center">
+            <span class="cuIcon-like margin-left text-red" :style="{fontSize:'18px'}"/>
+            喜欢
+            <span class="cuIcon-attentionforbid margin-left text-red" :style="{fontSize:'18px'}"/>
+            不感兴趣
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import wepy from "@wepy/core"
+  import eventHub from '../common/eventHub';
+  wepy.component({
+    props: {
+      posts: Object
+    },
+
+    methods: {
+
+    }
+  })
+</script>
+
+<config>
+  {
+    usingComponents: {
+
+    }
+  }
+</config>

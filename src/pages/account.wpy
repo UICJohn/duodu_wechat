@@ -1,0 +1,173 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+  .top {
+    width: 100%;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20rpx;
+    align-items: center;
+  }
+
+  .menu{
+    margin-top: 30px;
+  }
+
+  .text{
+    padding-left: 10px;
+  }
+
+</style>
+
+<template>
+  <div class="top bg-gradual-blue" :style="{paddingTop: '50px' }">
+    <div class="thumb" :style="{width: '150rpx', height: '150rpx'}">
+      <open-data type="userAvatarUrl"></open-data>
+    </div>
+    <div class="username" :style="{marginTop: '10px', textAlign: 'center'}">
+      <open-data type="userNickName"></open-data>
+    </div>
+  </div>
+
+  <grid-list :list="list" />
+
+  <div class="cu-list menu">
+    <div class="cu-item">
+      <div class="content row">
+        <span class="cuIcon-profile text-green"/>
+        <div class="text-black margin-left-xs">
+          <span>我的资料</span>
+        </div>
+      </div>
+      <div class="action" v-on:click="navigateTo" data-url="profile">
+        <div class="cuIcon-edit text-grey"></div>
+      </div>
+    </div>
+    <div class="cu-item">
+      <div class="content row">
+        <span class="cuIcon-mail text-blue"/>
+        <div class="text-black margin-left-xs">
+          <span>安全邮箱</span>
+        </div>
+      </div>
+      <div class="action" v-on:click="navigateTo" data-url="email">
+        <div class="cuIcon-edit text-grey"></div>
+      </div>
+    </div>
+    <div class="cu-item">
+      <div class="content row">
+        <span class="cuIcon-mobile text-yellow"/>
+        <div class="text-black margin-left-xs">
+          <span>绑定手机</span>
+        </div>
+      </div>
+      <div class="action" v-on:click="navigateTo" data-url="phone">
+        <div class="cuIcon-edit text-grey"></div>
+      </div>
+    </div>
+    <div class="cu-item">
+      <div class="content row">
+        <span class="iconfont icon-blacklist text-mauve"/>
+        <div class="text-black margin-left-xs">
+          <span>黑名单</span>
+        </div>
+      </div>
+      <div class="action" v-on:click="navigateTo" data-url="blacklist">
+        <div class="cuIcon-right text-grey"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cu-list menu">
+    <div class="cu-item">
+      <div class="content padding-tb-sm">
+        <div>
+          <div class="iconfont icon-lock text-olive margin-right-xs">
+          </div>
+          敏感信息
+        </div>
+        <div class="text-gray text-sm">
+          对其他用户公开自己的公司, 学校
+        </div>
+      </div>
+      <div class="action">
+        <switch checked />
+      </div>
+    </div>
+    <div class="cu-item">
+      <div class="content padding-tb-sm">
+        <div>
+          <div class="iconfont icon-location text-purple margin-right-xs">
+          </div>
+          位置信息
+        </div>
+        <div class="text-gray text-sm">
+          公开我的位置信息
+        </div>
+      </div>
+      <div class="action">
+        <switch checked />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import wepy from '@wepy/core'
+
+  wepy.page({
+    data: {
+      list: [
+        {
+          text: '我的活动',
+          icon: 'activity',
+          iconColor: 'yellow',
+          fontSize: 28
+        },
+        {
+          text: '我的房源',
+          icon: 'house',
+          iconColor: 'green',
+          fontSize: 28
+        },
+        {
+          text: '我关注的',
+          icon: 'collection',
+          iconColor: 'blue',
+          fontSize: 28
+        },
+        {
+          text: '我浏览过',
+          icon: 'history',
+          iconColor: 'orange',
+          fontSize: 28
+        }
+      ],
+    },
+    onLoad() {
+
+    },
+    methods: {
+      navigateTo: function(e) {
+        console.log(e);     
+        wepy.wx.navigateTo({
+          url: e.currentTarget.dataset.url
+        })
+      }
+    }
+  });
+</script>
+
+<config>
+  {
+    navigationBarTitleText: '多度找室友',
+    usingComponents: {
+      'grid-list': "~components/gridList"
+    }
+  }
+</config>
+
+

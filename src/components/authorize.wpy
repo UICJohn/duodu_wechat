@@ -1,0 +1,94 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  page {
+    background-color: #fff;
+  }
+  .container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 15px;
+    color: #6b6c70;
+  }
+  .row {
+    margin-top: 15px;
+  }
+
+  .logo {
+    width: 100px;
+    height: 100px;
+    margin-left: 145px;
+    border-radius: 50%;
+    border: 2px solid #D0A475;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  .logo image{
+    width: 70px;
+    height: 80px;
+  }
+</style>
+
+<template>
+  <div v-if="{canIUse}" class="container">
+    <div class="header row" v-if="logo">
+      <div class="logo">
+        <image :src="logo" />
+      </div>
+    </div>
+    <div class="row">
+      <text class="title">{{title}}</text>
+    </div>
+    <div class="content row">
+      <div>申请获取以下权限</div>
+      <text>{{access}}</text>
+    </div>
+    <div class="row">
+      <button class="cu-btn lg shadow-blur bg-green" open-type="getUserInfo" lang="zh_CN" style="color: #fff; width: 85%;" bindgetuserinfo="getUserInfo">
+        授权登录
+      </button>
+    </div>
+  </div>
+  <div v-else>请升级微信版本</div>
+</template>
+
+<script>
+  import wepy from "@wepy/core"
+  import eventHub from '../common/eventHub';
+  wepy.component({
+    props: {
+      redirectTo: String,
+      redirectToTab: Boolean,
+      logo: String,
+      title: String,
+      access: String
+    },
+
+    methods: {
+      getUserInfo: function(e) {
+        console.log(this)
+        console.log("isTab = " + this.redirectToTab);
+        if (e.$wx.detail.rawData){
+          // console.log(e.$wx.detail.rawData);
+          eventHub.$emit('sync-user', e.$wx.detail.rawData);
+          if(this.redirectTo && !this.redirectToTab){
+            wepy.wx.redirectTo({
+              url: this.redirectTo
+            })
+          } else if(this.redirectTo && this.redirectToTab) {
+            wepy.wx.switchTab({
+              url: this.redirectTo
+            })
+          }
+        } else {
+          console.log(e.$wx.detail);
+        }
+      }
+    }
+  })
+</script>
