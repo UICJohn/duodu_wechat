@@ -26,13 +26,13 @@
 
 <template>
   <div class="flex align-center top padding-sm">
-    <div class="row margin-sm" @tap="selectCity">
+    <div class="row margin-sm" @tap="navigateTo" data-path="home/cities">
       <text class="text-sm"> {{location.city}} </text>
       <span class="cuIcon-unfold" :style="{paddingTop: '5rpx', marginLeft: '2rpx'}" />
     </div>
     <div class="input-group bg-gray sm margin-xs radius" :style="{paddingTop: '4rpx'}">
       <div class="cuIcon-search" :style="{paddingTop: '6rpx', paddintBottom: '4rpx', paddingLeft: '10rpx'}"/>
-      <input disabled="true" placeholder="搜索地址或小区名" class="paddint-sm" :style="{paddingLeft: '4rpx', width: '195px'}" @tap="chooseLocation"/>
+      <input disabled="true" placeholder="{{location.name || '搜索地址或小区名'}}" class="paddint-sm" :style="{paddingLeft: '4rpx', width: '195px'}" @tap="chooseLocation"/>
     </div>
     <div class="flex align-center margin-sm">
       <div class="cu-btn block bg-blue sm radius" @tap="newPost">
@@ -61,12 +61,12 @@
       <div class="block">
         <div class="cu-list menu text-left">
           <div class="cu-item">
-            <div class="flex justify-between align-center flex-sub" data-path="house" @tap="navigateTo">
+            <div class="flex justify-between align-center flex-sub" data-path="home/house" @tap="navigateTo">
               <div class="flex-sub">发布房源</div>              
             </div>
           </div>
           <div class="cu-item">
-            <div class="flex justify-between align-center flex-sub" data-path="housemate" @tap="navigateTo">
+            <div class="flex justify-between align-center flex-sub" data-path="home/housemate" @tap="navigateTo">
               <div class="flex-sub">发帖找室友</div>
             </div>
           </div>
@@ -77,19 +77,22 @@
 </template>
 
 <script>
-  import wepy from '@wepy/core'
-  import eventHub from '../common/eventHub'
+  import wepy from '@wepy/core';
+  import eventHub from '../common/eventHub';
+  import { mapState } from '@wepy/x';
+  import { getLocationByGeo } from '../common/map'
 
   wepy.page({
+
     data: {
-      showModal: false,
-      postModal: false,
-      modalInfo: {},
       location: {
         city: '北京市',
         district: '朝阳区',
         id: '110000'
       },
+      showModal: false,
+      postModal: false,
+      modalInfo: {},
       posts: [
         {
           title: '三里屯好房出租',
@@ -114,7 +117,6 @@
         }
       ]
     },
-
     methods: {
       chooseLocation(e) {
         wepy.wx.chooseLocation().then((res) => {
@@ -124,6 +126,15 @@
             longitude: res.longitude,
             latitude: res.latitude
           }
+          getLocationByGeo({longitude: res.longitude, latitude: res.latitude}).then(({ result }) => {
+            this.location = {
+              ...this.location,
+              city: result.ad_info.city,
+              district: result.ad_info.district,
+            }
+          }).reject((err) => {
+            console.log(err);
+          })
         }).catch((err) => {
           wepy.wx.getSetting().then((res) => {
             if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
@@ -137,9 +148,9 @@
           })
         })
       },
+
       newPost(e) {
         // wepy.wx.getSetting().then((res) => {
-          console.log(e);
         //   if(!res.authSetting["scope.userInfo"]) {
             
         //   }
@@ -152,9 +163,7 @@
         this.postModal = true
       },
 
-      selectCity(e) {
-        wepy.wx.navigateTo("cities");
-      },
+      
 
       navigateTo(e) {
         wepy.wx.navigateTo(e.currentTarget.dataset.path).then((res) => {
@@ -162,6 +171,7 @@
         })
       }
     },
+
     onLoad() {
       eventHub.$on('modal-confirm', ()=>{
         this.showModal = false;
@@ -169,6 +179,9 @@
       });
       eventHub.$on('modal-close', ()=>{
         this.showModal = false;
+      });
+      eventHub.$on('select-city', (res)=> {
+        this.location = res;
       });
     }
   });

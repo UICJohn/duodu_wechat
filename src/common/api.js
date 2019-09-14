@@ -3,7 +3,7 @@ import eventHub from './eventHub';
 import wepy from '@wepy/core';
 
 // console.log(wepy);
-const host = 'http://192.168.31.224:3000'
+const host = 'http://0.0.0.0:3000'
 
 const authenticate = () => {
   return new Promise((resolve, reject) => { 

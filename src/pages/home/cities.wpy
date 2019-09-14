@@ -90,27 +90,27 @@
     </div>
   </div>
 
-  <scroll-view scroll-y scroll-into-view="{{listCurID}}" scroll-with-animation="true" enable-back-to-top="true" class="indexes" style="height: 100%">
-    <div v-for="(item, index) in list" wx:key="index">
-      <div class="padding indexItem-{{list[index]}}" id="{{list[index]}}" data-index="{{list[index]}}">{{list[index]}}</div>
+  <scroll-view scroll-y="1" scroll-into-view="{{listCurID}}" scroll-with-animation="true" enable-back-to-top="true" class="indexes" style="height:calc(100vh - 50px)">
+    <block v-for="(item, index) in cities" wx:key="index">
+      <div class="padding indexItem-{{index}}" :id="index" data-index="{{index}}">{{index}}</div>
       <div class="cu-list menu-avatar no-padding">
-        <div class="cu-item" wx:for="{{2}}" wx:key wx:for-index="sub">
-          <div class="cu-avatar round lg">{{list[index]}}</div>
+        <div class="cu-item" v-for="(city, idx) in item" wx:key="idx" wx:for-index="idx" :data-id="city.id" :data-city="city.fullname" @tap="select">
+          <div class="cu-avatar round lg">{{index}}</div>
           <div class="content">
-            <div class="text-grey">{{list[index]}}
-              <text class="text-abc">{{list[sub]}}</text>君</div>
-            <div class="text-gray text-sm">
-              有{{sub+2}}个主子需要伺候
+            <div class="text-grey">
+              {{city.fullname}}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </block>
   </scroll-view>
 
   <div class="indexBar" style="height: 100%">
     <div class="indexBar-box" bindtouchstart="tStart" bindtouchend="tEnd" catchtouchmove="tMove">
-      <div class="indexBar-item" wx:for="{{list}}" wx:key="index" id="{{index}}" bindtouchstart="getCur" bindtouchend="setCur">{{list[index]}}</div>
+      <div class="indexBar-item" v-for="(item, index} in cities" v-key="index" :id="index" bindtouchstart="getCur" bindtouchend="setCur">
+        {{index}}
+      </div>
     </div>
   </div>
   <!--选择显示-->
@@ -121,6 +121,10 @@
 
 <script>
   import wepy from '@wepy/core';
+  import {cities} from '../../common/cities';
+  import store from '../../store';
+  import eventHub from '../../common/eventHub';
+
   wepy.page({
     data: {
       list: null,
@@ -130,6 +134,8 @@
       listCurID: 'A',
       barHeight: null,
       movableY: null,
+      cities: cities,
+      alphaB: null,
     },
 
     onLoad() {
@@ -137,12 +143,10 @@
       for (let i = 0; i < 26; i++) {
         list[i] = String.fromCharCode(65 + i)
       }
-      this.list = list
-      this.listCur = list[0]
+      this.alphaB = list;
     },
 
     onReady() {
-      
       wx.createSelectorQuery().select('.indexBar-box').boundingClientRect(function(res) {
         this.boxTop = res.top
       }).exec();
@@ -154,12 +158,12 @@
     methods:{
       getCur(e) {
         this.hidden = false
-        this.listCur = this.list[e.target.id]
+        this.listCur = e.target.id
       },
 
       setCur(e) {
         this.hidden = true
-        this.listCur = this.listCur 
+        this.listCur = this.listCur
       },
 
       //滑动选择Item
@@ -169,7 +173,7 @@
         //判断选择区域,只有在选择区才会生效
         if (y > offsettop) {
           let num = parseInt((y - offsettop) / 20);
-          this.listCur = this.list[num]
+          this.listCur = this.alphaB[num];
         };
       },
 
@@ -182,6 +186,13 @@
       tEnd() {
         this.hidden = true
         this.listCurID = this.listCur
+      },
+
+      select(e) {
+        eventHub.$emit('select-city', e.currentTarget.dataset);
+        wepy.wx.navigateBack(1).then((res) => {
+          console.log(store.state);
+        });
       },
 
       indexSelect(e) {
@@ -201,7 +212,7 @@
 
 <config>
   {
-    navigationBarTitleText: '绑定手机',
+    navigationBarTitleText: '选择城市',
     usingComponents: {
 
     }

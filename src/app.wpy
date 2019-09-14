@@ -32,17 +32,17 @@
 
 <script>
   import wepy from '@wepy/core';
-  import eventHub from './common/eventHub';
   import vuex from '@wepy/x';
+  import promisify  from '@wepy/use-promisify';
+  import eventHub from './common/eventHub';
   import { userMapping } from './common/utils';
   import { authenticate } from './common/api';
-  import promisify  from '@wepy/use-promisify';
 
   wepy.use(vuex);
   wepy.use(promisify);
 
   wepy.app({
-    
+
     data: {
 
     },
