@@ -24,12 +24,12 @@
       标题
       <span class="require">*</span>
     </div>
-    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="简单介绍一下"/>
+    <input v-model="title" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="简单介绍一下"/>
   </div>
 
   <div class="cu-form-group align-start">
     <div class="title">简介</div>
-    <textarea placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..."></textarea>
+    <textarea v-model="body" placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..."></textarea>
   </div>
 
   <div class="cu-form-group margin-top">
@@ -37,7 +37,7 @@
       地址
       <span class="require">*</span>
     </div>
-    <input disabled="true" placeholder="选择地点或者小区"/>
+    <input v-model="address" disabled="true" placeholder="选择地点或者小区"/>
     <div class="action">
       <div class="cuIcon-right"></div>
     </div>
@@ -50,7 +50,7 @@
         <span class="require">*</span>
       </div>
     </div>
-    <input name="rent" placeholder="租金需少于6位数" type="number"/>
+    <input v-model="rent" name="rent" placeholder="租金需少于6位数" type="number"/>
     <div class="action">
       <text>元/月</text>
     </div>
@@ -61,11 +61,11 @@
       户型
       <span class="require">*</span>
     </div>  
-    <input name="rooms" type="number" :style="{width: '10px', textAlign: 'center'}"/>
+    <input v-model="rooms" name="rooms" type="number" :style="{width: '10px', textAlign: 'center'}"/>
     室
-    <input name="livings" type="number" :style="{width: '10px', textAlign: 'center'}"/>
+    <input v-model="livings" name="livings" type="number" :style="{width: '10px', textAlign: 'center'}"/>
     厅
-    <input name="toilets" type="number" :style="{width: '10px', textAlign: 'center'}"/>
+    <input v-model="toilets" name="toilets" type="number" :style="{width: '10px', textAlign: 'center'}"/>
     卫
   </div>
 
@@ -74,7 +74,7 @@
       类型
       <span class="require">*</span>  
     </div>
-    <picker bindchange="setLeaseType" value="{{leaseTypeIndex}}" range="{{leaseType}}">
+    <picker bindchange="setLeaseType" value="{{leaseTypeIndex}}" range="{{leaseTypes}}">
       <div class="picker">
         出租类型
       </div>
@@ -89,32 +89,38 @@
       </div>
     </div>
     
-    <picker bindchange="setPaymentType" value="{{paymentTypeIndex}}" range="{{paymentType}}">
+    <picker bindchange="setPaymentType" value="{{paymentTypeIndex}}" range="{{paymentTypes}}">
       <div class="picker">
-        {{paymentTypeIndex ? paymentType[paymentTypeIndex] : "付款方式" }}
+        {{paymentTypeIndex ? paymentTypes[paymentTypeIndex] : "付款方式" }}
       </div>
     </picker>
   
   </div>
 
-  <div class="cu-form-group">
+  <div class="cu-form-group" v-if="leaseTypeIndex==1">
     <div class="title">
       已入住
       <span class="require">*</span>
     </div>
-    <input name="tenant" style="width: 50rpx" type="number"/>
+    <input v-model="tenants" name="tenant" style="width: 50rpx" type="number"/>
     <div class="action">
       人
     </div>
   </div>
 
-
+<!--   <div class="cu-form-group">
+    <div class="title">入住时间</div>
+    <picker mode="date" :value="availableFrom" :start="now">
+      <div class="picker">{{availableFrom || now}}</div>
+    </picker>
+  </div> -->
+  
   <div class="cu-bar bg-white margin-top">
     <div class="action">
       图片上传
     </div>
     <div class="action">
-      {{images.length}}/9
+      {{images.length}}/8
     </div>
   </div>
 
@@ -126,7 +132,7 @@
           <text class="cuIcon-close"></text>
         </div>
       </div>
-      <div class="solids" @tap="chooseImage" v-if="images.length<9">
+      <div class="solids" @tap="chooseImage" v-if="images.length<8">
         <text class="cuIcon-cameraadd"></text>
       </div>
     </div>
@@ -140,7 +146,41 @@
 
   wepy.page({
     data: {
-      images: []
+      // form
+      images: [],
+      title: null,
+      body: null,
+      rent: null,
+      rooms: null,
+      livings: null,
+      toilets: null,
+      tenants: null,
+      // others
+      leaseTypes: ["整租", "分租"],
+      leaseTypeIndex: null,
+      paymentTypes: ["押一付一", "押一付三", "押一付六", "押一年付", "押二付一", "其它"],
+      paymentTypeIndex: null,
+    },
+    methods: {
+      createPost(e){
+        console.log(e);
+      },
+      setLeaseType(e){
+        this.leaseTypeIndex= e.detail.value;
+      },
+      setPaymentType(e){
+        this.paymentTypeIndex = e.detail.value;
+      },
+      chooseImage(e){
+        wepy.wx.chooseImage({
+          count: 8,
+          sizeType: ['original', 'compressed']
+        }).then((res) => {
+          if (res.tempFilePaths.length > 0 && (this.images.length + res.tempFilePaths.length) < 10) {
+            this.images = this.images.concat(res.tempFilePaths)
+          }
+        })
+      }
     },
     onLoad() {
 
@@ -150,7 +190,7 @@
 
 <config>
   {
-    navigationBarTitleText: '绑定手机',
+    navigationBarTitleText: '发布房源',
     usingComponents: {
 
     }

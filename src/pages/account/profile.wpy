@@ -23,16 +23,16 @@
       年龄
       <span class="require">*</span>
     </div>
-    <select>
+    <select mode="date" :value="dob" start="1950-01-01" end="2001-12-31" bindchange="dobChange">
       <div>
         <div class="picker">
-          选择年龄段
+          {{dob || '出生日期'}}
         </div>
       </div>
     </select>
   </div>
 
-  <div class="cu-form-group">
+  <div class="cu-form-group" @tap="navigateTo" data-url="school" data-clickEvent="choose-school">
     <div class="title">
       院校
       <span class="require">*</span>
@@ -47,35 +47,63 @@
       专业
       <span class="require">*</span>
     </div>
-    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写专业">
+    <input v-model="major" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写专业">
   </div>
   <div class="cu-form-group">
     <div class="title">
       公司
       <span class="require">*</span>
     </div>
-    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写所在公司">
+    <input v-model="profiles.company" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写所在公司">
   </div>
   <div class="cu-form-group">
     <div class="title">
       职业
       <span class="require">*</span>
     </div>
-    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写职业">
+    <input v-model="profile.occupation" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写职业">
   </div>
 
-  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">提交</button>
+  <button @tap="submit" class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">提交</button>
 </template>
 
 <script>
   import wepy from '@wepy/core'
+  import eventHub from '../../common/eventHub'
 
   wepy.page({
     data: {
-
+      dob: null,
+      school: null,
+      major: null,
+      company: null,
+      occupation: null
     },
-    onLoad() {
 
+    onLoad(params, data) {
+      console.log(params);
+      for(let key in this.$options.data){
+        this.$options.data[key] = params[key]
+      }
+      console.log(this);
+    },
+
+    methods: {
+      regEvents(){
+        eventHub.$on('choose-school', (school, $event)=>{
+          this.school = school
+        })
+      },
+      submit(e) {
+        console.log(this.dob);
+      },
+      dobChange(e) {
+        this.dob = e.$wx.detail.value
+      },
+      navigateTo(e) {
+        console.log(e);
+        this.$navigate(e.currentTarget.dataset.url, {'event': e.currentTarget.dataset.clickEvent})
+      }
     }
   });
 </script>
@@ -88,5 +116,3 @@
     }
   }
 </config>
-
-

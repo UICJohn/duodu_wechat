@@ -43,7 +43,7 @@
   </div>
 
   <div class="content">
-    <card :posts="posts"/>
+    <card :posts="posts" clickImageEvent="show-post"/>
   </div>
   <modal :show.sync="showModal" :title="modalInfo.title" :body="modalInfo.body" :confirmEvent="modalInfo.confirmEvent" />
 
@@ -95,6 +95,7 @@
       modalInfo: {},
       posts: [
         {
+          id: 1,
           title: '三里屯好房出租',
           timestamp: '2小时前',
           body: '不抽烟喝酒烫头',
@@ -162,9 +163,6 @@
         // })
         this.postModal = true
       },
-
-      
-
       navigateTo(e) {
         wepy.wx.navigateTo(e.currentTarget.dataset.path).then((res) => {
           this.postModal = false;
@@ -183,6 +181,9 @@
       eventHub.$on('select-city', (res)=> {
         this.location = res;
       });
+      eventHub.$on('show-post', (res) => {
+        this.$navigate('postDetail', [res.id]);
+      })
     }
   });
 </script>

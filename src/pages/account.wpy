@@ -94,7 +94,7 @@
         </div>
       </div>
       <div class="action">
-        <switch checked />
+        <switch id="show_privacy_data" checked="{{profiles.preference.show_privacy_data}}" @change="changePreferece" />
       </div>
     </div>
     <div class="cu-item">
@@ -109,14 +109,15 @@
         </div>
       </div>
       <div class="action">
-        <switch checked />
+        <switch id="share_location" checked="{{profiles.preference.share_location}}" @change="changePreferece"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import wepy from '@wepy/core'
+  import wepy from '@wepy/core';
+  import eventHub from '../common/eventHub';
 
   wepy.page({
     data: {
@@ -146,16 +147,32 @@
           fontSize: 28
         }
       ],
+      profiles: null
     },
-    onLoad() {
 
+    onLoad() {
+      this.regEvents();
+      eventHub.$emit('sync-user');
     },
+
     methods: {
-      navigateTo: function(e) {
-        console.log(e);     
-        wepy.wx.navigateTo({
-          url: e.currentTarget.dataset.url
+
+      changePreferece(e) {
+        let preference= {} 
+        preference["id"] = this.profiles.preference.id
+        preference[e.target.id] = !this.profiles.preference[e.target.id]
+        eventHub.$emit('sync-user', { preference_attributes: preference });
+      },
+
+      regEvents() {
+        eventHub.$on('profiles-updated', (profiles, $event) => {
+          this.profiles = profiles        
+          console.log(this.profiles);
         })
+      },
+
+      navigateTo: function(e) {   
+        this.$navigate(e.currentTarget.dataset.url, this.profiles);
       }
     }
   });

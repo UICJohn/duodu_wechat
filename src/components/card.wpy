@@ -8,7 +8,7 @@
 <template>
   <div class="cu-card case">
     <div v-for="(post, index) in posts" class="cu-item shadow">
-      <div class="image">
+      <div class="image" @tap="clickImage" :id="post.id || index">
         <div style="height: 187.561px;">
           <div style="background-size: 100% 100%; background-repeat: no-repeat; background-image: url({{post.attachments[0].url}});"></div>
           <img src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg">
@@ -67,11 +67,15 @@
   import eventHub from '../common/eventHub';
   wepy.component({
     props: {
-      posts: Object
+      posts: Object,
+      clickImageEvent: String,
+      key: String,
     },
 
     methods: {
-
+      clickImage(e){
+        eventHub.$emit(this.clickImageEvent, e.currentTarget);
+      }
     }
   })
 </script>

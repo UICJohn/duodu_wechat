@@ -1,0 +1,44 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  page{
+    background-color: #eee;
+  }
+</style>
+
+<template>
+
+</template>
+
+<script>
+  import wepy from '@wepy/core';
+  import eventHub from '../common/eventHub';
+  import { mapState } from '@wepy/x';
+  
+
+  wepy.page({
+
+    data: {
+      post: null
+    },
+
+    methods: {
+
+    },
+
+    onLoad(params) {
+      
+    }
+  });
+</script>
+<config>
+  {
+    navigationBarTitleText: '多度找室友',
+    usingComponents: {
+
+    }
+  }
+</config>

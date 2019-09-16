@@ -36,7 +36,7 @@
   import promisify  from '@wepy/use-promisify';
   import eventHub from './common/eventHub';
   import { userMapping } from './common/utils';
-  import { authenticate } from './common/api';
+  import { authenticate, fetchUser, updateUser } from './common/api';
 
   wepy.use(vuex);
   wepy.use(promisify);
@@ -49,36 +49,37 @@
 
     onLaunch() {
       // event hanlder
-      eventHub.$on('sync-user', (userInfo, $event) => {
-
-      });
-
-      eventHub.$on('wx-error', (err) => {
-        console.log(err);
-      });
-
-      eventHub.$on('open-setting', () => {
-        wepy.wx.openSetting().catch((err) => {
-          this.$emit('wx-error', err);
-        })
-      });
-
-      eventHub.$on('auth-user', () => {
-        authenticate().then((res) => {
-          wepy.wx.setStorage({
-            key: 'accessToken',
-            value: res.header["Authorization"]
-          }).catch((err) => {
-            eventHub.$emit('wx-error', err);
-          })
-        });
-      });
-
-      authenticate();
+      this.regAppEvents();
+      eventHub.$emit('auth-user');
+      // eventHub.$emit('auth-user');
     },
 
     methods: {
+      regAppEvents(){
+        eventHub.$on('sync-user', (profiles, $event) => {
+          if(profiles){
+            updateUser(profiles).then(res => eventHub.$emit('profiles-updated', res.data.user))
+          } else {
+            fetchUser().then(res => eventHub.$emit('profiles-updated', res.data.user))
+          }
+        });
 
+        eventHub.$on('wx-error', (err) => {
+          console.log(err);
+        });
+
+        eventHub.$on('open-setting', () => {
+          wepy.wx.openSetting().catch((err) => {
+            eventHub.$emit('wx-error', err);
+          })
+        });
+
+        eventHub.$on('auth-user', () => {          
+          authenticate().then((res) => {
+            wepy.wx.setStorageSync('accessToken', res.header["Authorization"])
+          });
+        });
+      }
     }
 
   });
@@ -87,8 +88,10 @@
 <config>
 {
   pages: [
-    'pages/home',
+    'pages/school',
     'pages/account',
+    'pages/home',
+    'pages/postDetail',
     'pages/activity',
     'pages/message',
   ],
