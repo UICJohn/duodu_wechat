@@ -18,13 +18,16 @@
       </div>
     </div>
   </div>
+  <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', bottom: 0, width: '100%', position:'absolute'}">
+    {{error ? '提交失败' : '提交成功'}}
+  </div>
   
   <div class="cu-form-group margin-top-sm">
     <div class="title">
       邮箱
       <span class="require">*</span>
     </div>
-    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写安全邮箱"/>
+    <input v-model="email" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写安全邮箱"/>
   </div>
 
   <div class="cu-form-group">
@@ -32,11 +35,11 @@
       验证码
       <span class="require">*</span>
     </div>    
-    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="验证码"/>
-    <button class="cu-btn bg-green shadow">验证码</button>
+    <input v-model="code" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="验证码"/>
+    <button class="cu-btn bg-green shadow" @tap="requestCode">验证码</button>
   </div>
 
-  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">
+  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}" @tap="submit">
     提交
   </button>
 </template>
@@ -44,37 +47,101 @@
 <script>
   import wepy from '@wepy/core'
   import eventHub from '../../common/eventHub'
+  import { sendCode, updateEmail } from '../../common/api'
+
   const WeValidator = require('we-validator')
 
   wepy.page({
+
     data: {
+      showStatus: false,
       email: null,
-      verificationCode: null,
+      code: null,
     },
 
     onLoad(params, data) {
+      this.regEvents();
       for(let key in this.$options.data){
         if (params[key] && params[key] != 'null'){
-          this[key] = decodeURI(params[key])
+          this[key] = decodeURIComponent(params[key])
         }
       }
-      this.initValidator();
     },
+
     methods:{
-      initValidator() {
-        this.validatorInstance = new WeValidator({
+
+      regEvents(){
+        eventHub.$on('profiles-updated', () => {
+          this.showStatusBar();
+          setTimeout(function(){
+            wepy.wx.navigateBack(1);
+          }, 2000);
+        });
+      },
+
+      requestCode(e){
+        let validator = this.phoneValidator();
+        if (! validator.checkData({email: this.email})) return
+        sendCode({email: this.email})
+      },
+
+      submit(e) {
+        let validator = this.formValidator();
+        if (! validator.checkData({email: this.email, code: this.code})) return
+        updateEmail({
+          email: this.email,
+          code: this.code
+        }).then(res => {
+          eventHub.$emit('sync-user');
+        })
+      },
+
+      showStatusBar(){
+        let that = this;
+        this.showStatus = true
+        setTimeout(function(){
+          that.showStatus = false
+        }, 2000);
+      },
+
+      phoneValidator() {
+        return new WeValidator({
           rules: {
-            dob: {
-              required: true
+            email: {
+              required: true,
+              email: true
             },
           },
           messages: {
-            dob: {
-              required: '请填写出生日期'
+            email: {
+              required: '请填写邮箱'
             },
           },
         })
       },
+
+      formValidator() {
+        return new WeValidator({
+          rules: {
+            email: {
+              required: true,
+              email: true
+            },
+            code: {
+              required: true
+            }
+          },
+          messages: {
+            email: {
+              required: '请填写邮箱'
+            },
+            code: {
+              required: '请填写验证码'
+            }
+          },
+        })
+      },
+      
     }
   });
 </script>

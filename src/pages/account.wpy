@@ -54,7 +54,7 @@
         </div>
       </div>
       <div class="action" v-on:click="navigateTo" data-url="account/email">
-        <div class="cuIcon-edit text-grey"></div>
+        <div class="cuIcon-edit text-{{profiles.email ? 'green' : 'gray'}}"></div>
       </div>
     </div>
     <div class="cu-item">
@@ -65,7 +65,7 @@
         </div>
       </div>
       <div class="action" v-on:click="navigateTo" data-url="account/phone">
-        <div class="cuIcon-edit text-grey"></div>
+        <div class="cuIcon-edit text-{{profiles.phone ? 'green' : 'gray'}}"></div>
       </div>
     </div>
     <div class="cu-item">

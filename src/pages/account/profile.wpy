@@ -85,7 +85,7 @@
       this.regEvents();
       for(let key in this.$options.data){
         if (params[key] && params[key] != 'null'){
-          this[key] = decodeURI(params[key])
+          this[key] = decodeURIComponent(params[key])
         }
       }
       this.initValidator();

@@ -40,7 +40,7 @@ const sendCode = (data) => {
     fetchTokenHeader().then((header) => {
       request({
         url: host + "/v1/verification_code",
-        method:'POST'
+        method:'POST',
         data: data,
         header: header
       }).then((res) => {
@@ -50,6 +50,21 @@ const sendCode = (data) => {
   })
 }
 
+
+const updateEmail = (data) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: host + "/v1/profiles/update_email",
+        method: 'PUT',
+        data: data,
+        header: header
+      }).then(res => {
+        resolve(res);
+      })
+    })
+  })
+}
 // const sentEmailCode = (email) => {
 //   return new Promise((resolve, reject) => { 
 //     fetchTokenHeader().then((header) => {
@@ -125,4 +140,6 @@ module.exports = {
   fetchUser: fetchUser,
   updateUser: updateUser,
   fetchSchools: fetchSchools,
+  sendCode: sendCode,
+  updateEmail: updateEmail,
 }
