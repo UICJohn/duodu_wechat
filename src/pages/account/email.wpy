@@ -18,9 +18,6 @@
       </div>
     </div>
   </div>
-  <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', bottom: 0, width: '100%', position:'absolute'}">
-    {{error ? '提交失败' : '提交成功'}}
-  </div>
   
   <div class="cu-form-group margin-top-sm">
     <div class="title">
@@ -42,6 +39,9 @@
   <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}" @tap="submit">
     提交
   </button>
+  <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', bottom: 0, width: '100%', position:'absolute'}">
+    {{error ? error : '提交成功'}}
+  </div>
 </template>
 
 <script>
@@ -54,6 +54,7 @@
   wepy.page({
 
     data: {
+      error: null,
       showStatus: false,
       email: null,
       code: null,
@@ -76,6 +77,18 @@
           setTimeout(function(){
             wepy.wx.navigateBack(1);
           }, 2000);
+        });
+
+        eventHub.$on('bad-request', (res) => {
+          let errors = []
+          if (res.data.error.code){
+            errors.push(res.data.error.code)
+          }
+          if (res.data.error.phone){
+            errors.push(res.data.error.phone)
+          }
+          this.error = errors.join(";")
+          this.showStatusBar();
         });
       },
 

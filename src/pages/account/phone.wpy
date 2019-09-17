@@ -25,7 +25,7 @@
       <span class="require">*</span>
     </div>
 
-    <input type="text" placeholder="请填写手机号码"/>
+    <input type="text" v-model="phone" placeholder="请填写手机号码"/>
     <div class="cu-capsule radius">
       <span class="cu-tag bg-blue ">+86</span>
       <span class="cu-tag line-blue">中国大陆</span>
@@ -37,31 +37,135 @@
       验证码
       <span class="require">*</span>
     </div>    
-    <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="验证码"/>
-    <button class="cu-btn bg-green shadow">验证码</button>
+    <input type="text" v-model="code" style="height: 26.25px; line-height: 26.25px;" placeholder="验证码"/>
+    <button class="cu-btn bg-green shadow" @tap="requestCode">验证码</button>
   </div>
 
-  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">提交</button>
+  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}" @tap="submit">提交</button>
+  <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', bottom: 0, width: '100%', position:'absolute'}">
+    {{error ? error : '提交成功'}}
+  </div>
 </template>
 
 <script>
   import wepy from '@wepy/core'
+  import eventHub from '../../common/eventHub'
+  import { sendCode, updatePhone } from '../../common/api'
+
+  const WeValidator = require('we-validator')
 
   wepy.page({
+
     data: {
-
+      error: false,
+      showStatus: false,
+      phone: null,
+      code: null,
     },
-    onLoad() {
 
+    onLoad(params, data) {
+      this.regEvents();
+      for(let key in this.$options.data){
+        if (params[key] && params[key] != 'null'){
+          this[key] = decodeURIComponent(params[key])
+        }
+      }
+    },
+
+    methods:{
+
+      regEvents(){
+        eventHub.$on('profiles-updated', () => {
+          this.showStatusBar();
+          setTimeout(function(){
+            wepy.wx.navigateBack(1);
+          }, 2000);
+        });
+
+        eventHub.$on('bad-request', (res) => {
+          let errors = []
+          if (res.data.error.code){
+            errors.push(res.data.error.code)
+          }
+          if (res.data.error.phone){
+            errors.push(res.data.error.phone)
+          }
+          this.error = errors.join(";")
+          this.showStatusBar();
+        });
+      },
+
+      requestCode(e){
+        let validator = this.phoneValidator();
+        if (! validator.checkData({phone: this.phone})) return
+        sendCode({phone: this.phone})
+      },
+
+      submit(e) {
+        let validator = this.formValidator();
+        if (! validator.checkData({phone: this.phone, code: this.code})) return
+        updatePhone({
+          phone: this.phone,
+          code: this.code
+        }).then(res => {
+          eventHub.$emit('sync-user');
+        })
+      },
+
+      showStatusBar(){
+        let that = this;
+        this.showStatus = true
+        setTimeout(function(){
+          that.showStatus = false
+        }, 2000);
+      },
+
+      phoneValidator() {
+        return new WeValidator({
+          rules: {
+            phone: {
+              required: true,
+              mobile: true
+            },
+          },
+          messages: {
+            phone: {
+              required: '请填写手机号'
+            },
+          },
+        })
+      },
+
+      formValidator() {
+        return new WeValidator({
+          rules: {
+            phone: {
+              required: true,
+              phone: true
+            },
+            code: {
+              required: true
+            }
+          },
+          messages: {
+            phone: {
+              required: '请填写手机号'
+            },
+            code: {
+              required: '请填写验证码'
+            }
+          },
+        })
+      },
+      
     }
   });
 </script>
 
 <config>
   {
-    navigationBarTitleText: '绑定手机',
+    navigationBarTitleText: '更新手机号码',
     usingComponents: {
-
     }
   }
 </config>

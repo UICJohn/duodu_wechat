@@ -65,6 +65,22 @@ const updateEmail = (data) => {
     })
   })
 }
+
+
+const updatePhone = (data) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: host + "/v1/profiles/update_phone",
+        method: 'PUT',
+        data: data,
+        header: header
+      }).then(res => {
+        resolve(res);
+      })
+    })
+  })
+}
 // const sentEmailCode = (email) => {
 //   return new Promise((resolve, reject) => { 
 //     fetchTokenHeader().then((header) => {
@@ -85,8 +101,6 @@ const updateUser = (profiles) => {
         method: 'PUT'
       }).then((res) => {
         resolve(res);
-      }).catch((res) => {
-        reject(res);
       })
     })
   })
@@ -142,4 +156,5 @@ module.exports = {
   fetchSchools: fetchSchools,
   sendCode: sendCode,
   updateEmail: updateEmail,
+  updatePhone: updatePhone,
 }

@@ -94,8 +94,8 @@
 <config>
 {
   pages: [
-    'pages/home',
     'pages/account',
+    'pages/home',
     'pages/activity',
     'pages/message',
   ],
@@ -106,7 +106,7 @@
     },
     {
       root: 'pages/account',
-      pages: [ 'email', 'phone', 'school', 'profile']
+      pages: [ 'email', 'phone', 'school', 'profile', 'blackList']
     },
     {
       root: 'pages/share/',

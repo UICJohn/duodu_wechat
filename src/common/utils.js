@@ -15,12 +15,12 @@ const request = (options) => {
 };
 
 const errorHanlder = (res) => {
-  return new Promise((resolve, reject) => { 
+  return new Promise((resolve, reject) => {
     if (res.statusCode === 401){
       eventHub.$emit('auth-user');
       eventHub.$emit('server-error', res);
       reject(res);
-    } else if(res.statusCode === 404 || res.statusCode === 422 || res.statusCode === 500){
+    } else if([400, 404, 422, 500].includes(res.statusCode)){
       eventHub.$emit('bad-request', res);
       reject(res);
     } else {
