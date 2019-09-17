@@ -51,16 +51,27 @@
       // event hanlder
       this.regAppEvents();
       eventHub.$emit('auth-user');
-      // eventHub.$emit('auth-user');
     },
 
     methods: {
       regAppEvents(){
+
+        eventHub.$on('auth-user', () => {          
+          authenticate().then((res) => {
+            wepy.wx.setStorageSync('accessToken', res.header["Authorization"])
+          });
+        });
+
         eventHub.$on('sync-user', (profiles, $event) => {
           if(profiles){
-            updateUser(profiles).then(res => eventHub.$emit('profiles-updated', res.data.user))
+            updateUser(profiles).then((res) => {
+              eventHub.$emit('profiles-updated', res.data.user);
+            });
           } else {
-            fetchUser().then(res => eventHub.$emit('profiles-updated', res.data.user))
+            fetchUser().then((res) => {
+              eventHub.$emit('profiles-updated', res.data.user);
+              console.log(this.profiles);
+            });
           }
         });
 
@@ -74,11 +85,6 @@
           })
         });
 
-        eventHub.$on('auth-user', () => {          
-          authenticate().then((res) => {
-            wepy.wx.setStorageSync('accessToken', res.header["Authorization"])
-          });
-        });
       }
     }
 
@@ -88,21 +94,19 @@
 <config>
 {
   pages: [
-    'pages/school',
-    'pages/account',
     'pages/home',
-    'pages/postDetail',
+    'pages/account',
     'pages/activity',
     'pages/message',
   ],
   subPackages:[
     {
       root: 'pages/home',
-      pages: ['housemate', 'house', 'cities']
+      pages: ['housemate', 'house', 'cities', 'postDetail']
     },
     {
       root: 'pages/account',
-      pages: [ 'email', 'phone', 'profile']
+      pages: [ 'email', 'phone', 'school', 'profile']
     },
     {
       root: 'pages/share/',

@@ -43,13 +43,38 @@
 
 <script>
   import wepy from '@wepy/core'
+  import eventHub from '../../common/eventHub'
+  const WeValidator = require('we-validator')
 
   wepy.page({
     data: {
-
+      email: null,
+      verificationCode: null,
     },
-    onLoad() {
 
+    onLoad(params, data) {
+      for(let key in this.$options.data){
+        if (params[key] && params[key] != 'null'){
+          this[key] = decodeURI(params[key])
+        }
+      }
+      this.initValidator();
+    },
+    methods:{
+      initValidator() {
+        this.validatorInstance = new WeValidator({
+          rules: {
+            dob: {
+              required: true
+            },
+          },
+          messages: {
+            dob: {
+              required: '请填写出生日期'
+            },
+          },
+        })
+      },
     }
   });
 </script>

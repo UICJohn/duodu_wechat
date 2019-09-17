@@ -35,44 +35,45 @@
   <div class="cu-form-group" @tap="navigateTo" data-url="school" data-clickEvent="choose-school">
     <div class="title">
       院校
-      <span class="require">*</span>
     </div>
     <div style="height: 26.25px; line-height: 26.25px;">
-      选择毕业/在读院校
+      {{ school || "选择毕业/在读院校"}}
     </div>
   </div>
 
   <div class="cu-form-group">
     <div class="title">
       专业
-      <span class="require">*</span>
     </div>
     <input v-model="major" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写专业">
   </div>
   <div class="cu-form-group">
     <div class="title">
       公司
-      <span class="require">*</span>
     </div>
-    <input v-model="profiles.company" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写所在公司">
+    <input v-model="company" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写所在公司">
   </div>
   <div class="cu-form-group">
     <div class="title">
       职业
-      <span class="require">*</span>
     </div>
-    <input v-model="profile.occupation" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写职业">
+    <input v-model="occupation" type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="填写职业">
   </div>
 
   <button @tap="submit" class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">提交</button>
+
+  <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', bottom: 0, width: '100%', position:'absolute'}">{{error ? '提交失败' : '提交成功'}}</div>
 </template>
 
 <script>
   import wepy from '@wepy/core'
   import eventHub from '../../common/eventHub'
+  const WeValidator = require('we-validator')
 
   wepy.page({
     data: {
+      showStatus: false,
+      error: null,
       dob: null,
       school: null,
       major: null,
@@ -81,28 +82,69 @@
     },
 
     onLoad(params, data) {
-      console.log(params);
+      this.regEvents();
       for(let key in this.$options.data){
-        this.$options.data[key] = params[key]
+        if (params[key] && params[key] != 'null'){
+          this[key] = decodeURI(params[key])
+        }
       }
-      console.log(this);
+      this.initValidator();
     },
 
     methods: {
-      regEvents(){
-        eventHub.$on('choose-school', (school, $event)=>{
-          this.school = school
+      initValidator() {
+        this.validatorInstance = new WeValidator({
+          rules: {
+            dob: {
+              required: true
+            },
+          },
+          messages: {
+            dob: {
+              required: '请填写出生日期'
+            },
+          },
         })
       },
+      regEvents(){
+        eventHub.$on('choose-school', (school, $event)=>{
+          this.school = school.name
+        });
+        eventHub.$on('profiles-updated', () => {
+          this.showStatusBar();
+          setTimeout(function(){
+            wepy.wx.navigateBack(1);
+          }, 2000);
+        });
+      },
+
+      showStatusBar(){
+        let that = this;
+        this.showStatus = true
+        setTimeout(function(){
+          that.showStatus = false
+        }, 2000);
+      },
+
       submit(e) {
-        console.log(this.dob);
+        let form = {
+          dob: this.dob,
+          school: this.school,
+          major: this.major,
+          company: this.company,
+          occupation: this.occupation
+        }
+
+        if (!this.validatorInstance.checkData(form)) return
+
+        eventHub.$emit('sync-user', form);
       },
       dobChange(e) {
         this.dob = e.$wx.detail.value
       },
       navigateTo(e) {
-        console.log(e);
-        this.$navigate(e.currentTarget.dataset.url, {'event': e.currentTarget.dataset.clickEvent})
+        console.log(e.currentTarget.dataset.clickevent);
+        this.$navigate(e.currentTarget.dataset.url, {event: e.currentTarget.dataset.clickevent})
       }
     }
   });

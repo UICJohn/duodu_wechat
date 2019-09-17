@@ -166,8 +166,7 @@
 
       regEvents() {
         eventHub.$on('profiles-updated', (profiles, $event) => {
-          this.profiles = profiles        
-          console.log(this.profiles);
+          this.profiles = profiles;
         })
       },
 

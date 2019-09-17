@@ -18,9 +18,9 @@ const errorHanlder = (res) => {
   return new Promise((resolve, reject) => { 
     if (res.statusCode === 401){
       eventHub.$emit('auth-user');
-      eventHub.$emit('wx-error', res);
+      eventHub.$emit('server-error', res);
       reject(res);
-    } else if(res.statusCode === 404 || res.statusCode === 422){
+    } else if(res.statusCode === 404 || res.statusCode === 422 || res.statusCode === 500){
       eventHub.$emit('bad-request', res);
       reject(res);
     } else {

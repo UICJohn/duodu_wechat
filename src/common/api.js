@@ -3,7 +3,7 @@ import eventHub from './eventHub';
 import wepy from '@wepy/core';
 
 // console.log(wepy);
-const host = 'http://0.0.0.0:3000'
+const host = 'http://192.168.1.32:3000'
 
 
 const fetchTokenHeader = () =>{
@@ -23,7 +23,8 @@ const authenticate = () => {
       request({
         url: host + '/users/wechat_auth',
         method: 'POST',
-        data: { code: res.code }
+        data: { code: res.code },
+        header: {'content-type': 'application/json'}
       }).then((res) => {
         resolve(res)
       })
@@ -33,6 +34,31 @@ const authenticate = () => {
     })
   });
 }
+
+const sendCode = (data) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: host + "/v1/verification_code",
+        method:'POST'
+        data: data,
+        header: header
+      }).then((res) => {
+        resolve(res);
+      })
+    })
+  })
+}
+
+// const sentEmailCode = (email) => {
+//   return new Promise((resolve, reject) => { 
+//     fetchTokenHeader().then((header) => {
+//       request({
+//         url: host 
+//       })
+//     })
+//   })
+// }
 
 const updateUser = (profiles) => {
   return new Promise((resolve, reject) => {    
@@ -74,10 +100,29 @@ const createPost = (data) => {
       url: host + ''
     })
   })
-} 
+}
+
+const fetchSchools = (key) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: host + "/v1/schools",
+        header: header,
+        data: {key: key},
+        method: 'GET'
+      }).then((res) => {
+        resolve(res.data.schools);
+      }).catch((res) => {
+        reject(res);
+      })
+    })
+  })
+}
+
 module.exports = {
   authenticate: authenticate,
   createPost: createPost,
   fetchUser: fetchUser,
   updateUser: updateUser,
+  fetchSchools: fetchSchools,
 }

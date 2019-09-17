@@ -1,0 +1,85 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  .flex-col {
+    display: flex;
+    flex-direction: column;
+  }
+</style>
+
+<template>
+  <div class="cu-bar bg-white search fixed" :style="{top:'0'}">
+    <div class="search-form round">
+      <text class="cuIcon-search"></text>
+      <input type="text" placeholder="输入搜索的关键词" bindinput="inputChange"/>
+    </div>
+  </div>
+  <div v-if="schools.length==0" :style="{marginTop: '150px', textAlign: 'center'}" class="flex-col align-center">
+    <image src="/assets/images/empty.png" :style="{width: '100px', height: '100px'}"/>
+    <text>暂无数据</text>
+  </div>
+  <div class="cu-list menu" v-else>
+    <block  v-for="item in schools" v-key="index">
+      <div :id="item.id" class="cu-item" @tap="selectSchool" :data-name="item.name">
+        <div class="content">
+          <span class="iconfont icon-school text-red  margin-right-xs"/>
+          <text class="text-grey">{{item.name}}</text>
+        </div>
+      </div>
+    </block>
+  </div>
+
+</template>
+
+<script>
+  import wepy from '@wepy/core'
+  import { fetchSchools } from '../../common/api'
+  import eventHub from '../../common/eventHub'
+
+  let timer = null;
+
+  wepy.page({
+    data: {
+      schools: [],
+      clickEvent: null,
+    },
+    onLoad(params, data) {
+      this.clickEvent = params.event
+    },
+    methods: {
+      searchSchool(key){
+        fetchSchools(key).then((schools) => {
+          this.schools = schools;
+        })
+      },
+
+      selectSchool(e){
+        wepy.wx.navigateBack(1).then( res => {
+          eventHub.$emit(this.clickEvent, e.currentTarget.dataset)
+        })
+      },
+
+      inputChange(e) {
+        let that = this
+        if (e.$wx.detail.value != "") {
+          clearTimeout(timer);
+          timer = setTimeout(function(){
+            that.searchSchool(e.$wx.detail.value)
+          }, 500);
+        }
+      },
+    }
+  });
+</script>
+
+<config>
+  {
+    navigationBarTitleText: '选择毕业/就读院校',
+    usingComponents: {
+      'grid-list': "~components/gridList"
+    }
+  }
+</config>
