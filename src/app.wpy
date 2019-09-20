@@ -94,15 +94,15 @@
 <config>
 {
   pages: [
-    'pages/account',
     'pages/home',
+    'pages/account',
     'pages/activity',
     'pages/message',
   ],
   subPackages:[
     {
       root: 'pages/home',
-      pages: ['housemate', 'house', 'cities', 'postDetail']
+      pages: ['housemate', 'cities', 'postDetail', 'house']
     },
     {
       root: 'pages/account',

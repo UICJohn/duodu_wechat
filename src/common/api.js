@@ -3,7 +3,7 @@ import eventHub from './eventHub';
 import wepy from '@wepy/core';
 
 // console.log(wepy);
-const host = 'http://192.168.1.32:3000'
+const host = 'http://192.168.31.224:3000'
 
 
 const fetchTokenHeader = () =>{
@@ -81,15 +81,24 @@ const updatePhone = (data) => {
     })
   })
 }
-// const sentEmailCode = (email) => {
-//   return new Promise((resolve, reject) => { 
-//     fetchTokenHeader().then((header) => {
-//       request({
-//         url: host 
-//       })
-//     })
-//   })
-// }
+
+const uploadPostImage = (post_id, image_path, data={}) => {
+  return new Promise((resolve, reject) => { 
+    fetchTokenHeader().then((header) => {
+      wepy.wx.uploadFile({
+        url: host + "/v1/posts/" + post_id + "/post/upload_images",
+        filePath: image_path,
+        name: 'attachment',
+        formData: data,
+        header: header
+      }).then(res => {
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })
+    })
+  })
+}
 
 const updateUser = (profiles) => {
   return new Promise((resolve, reject) => {    
@@ -123,14 +132,6 @@ const fetchUser = () => {
   })
 }
 
-const createPost = (data) => {
-  return new Promise((resolve, reject) => {
-    request({
-      url: host + ''
-    })
-  })
-}
-
 const fetchSchools = (key) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header) => {
@@ -139,9 +140,27 @@ const fetchSchools = (key) => {
         header: header,
         data: {key: key},
         method: 'GET'
-      }).then((res) => {
+      }).then(res => {
         resolve(res.data.schools);
-      }).catch((res) => {
+      }).catch(res => {
+        reject(res);
+      })
+    })
+  })
+}
+
+
+const createPost = (data) => {
+  return new Promise((resolve, reject)=>{
+    fetchTokenHeader().then((header) => {
+      request({
+        url: host + '/v1/posts',
+        header: header,
+        data: { post: data },
+        method: 'POST'
+      }).then(res => {
+        resolve(res.data.post);
+      }).catch(res => {
         reject(res);
       })
     })
@@ -157,4 +176,5 @@ module.exports = {
   sendCode: sendCode,
   updateEmail: updateEmail,
   updatePhone: updatePhone,
+  uploadPostImage: uploadPostImage
 }

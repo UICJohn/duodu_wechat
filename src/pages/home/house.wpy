@@ -28,7 +28,10 @@
   </div>
 
   <div class="cu-form-group align-start">
-    <div class="title">简介</div>
+    <div class="title">
+      简介
+      <span class="require">*</span>
+    </div>
     <textarea v-model="body" placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..."></textarea>
   </div>
 
@@ -37,7 +40,7 @@
       地址
       <span class="require">*</span>
     </div>
-    <input v-model="address" disabled="true" placeholder="选择地点或者小区"/>
+    <input disabled="1" placeholder="选择地点或者小区" v-model="location.address" @tap="chooseLocation"/>
     <div class="action">
       <div class="cuIcon-right"></div>
     </div>
@@ -45,15 +48,23 @@
 
   <div class="cu-form-group">
     <div class="title">
-      <div>
-        租金
-        <span class="require">*</span>
-      </div>
+      租金
+      <span class="require">*</span>
     </div>
     <input v-model="rent" name="rent" placeholder="租金需少于6位数" type="number"/>
     <div class="action">
       <text>元/月</text>
     </div>
+  </div>
+
+  <div class="cu-form-group">
+    <div class="title">
+      可入住时间
+      <span class="require">*</span>
+    </div>
+    <picker mode="date" :value="availableFrom" :start="now" :end="end" bindchange="dateChange">
+      <div class="picker">{{availableFrom || 'YY-MM-DD'}}</div>
+    </picker>
   </div>
 
   <div class="cu-form-group">
@@ -69,17 +80,6 @@
     卫
   </div>
 
-  <div class="cu-form-group">
-    <div class="title">
-      类型
-      <span class="require">*</span>  
-    </div>
-    <picker bindchange="setLeaseType" value="{{leaseTypeIndex}}" range="{{leaseTypes}}">
-      <div class="picker">
-        出租类型
-      </div>
-    </picker>
-  </div>
 
   <div class="cu-form-group">
     <div class="title">
@@ -94,7 +94,18 @@
         {{paymentTypeIndex ? paymentTypes[paymentTypeIndex] : "付款方式" }}
       </div>
     </picker>
-  
+  </div>
+
+  <div class="cu-form-group">
+    <div class="title">
+      类型
+      <span class="require">*</span>  
+    </div>
+    <picker bindchange="setLeaseType" value="{{leaseTypeIndex}}" range="{{leaseTypes}}">
+      <div class="picker">
+        {{ leaseTypeIndex ? leaseTypes[leaseTypeIndex] : '出租类型' }}
+      </div>
+    </picker>
   </div>
 
   <div class="cu-form-group" v-if="leaseTypeIndex==1">
@@ -107,13 +118,6 @@
       人
     </div>
   </div>
-
-<!--   <div class="cu-form-group">
-    <div class="title">入住时间</div>
-    <picker mode="date" :value="availableFrom" :start="now">
-      <div class="picker">{{availableFrom || now}}</div>
-    </picker>
-  </div> -->
   
   <div class="cu-bar bg-white margin-top">
     <div class="action">
@@ -126,11 +130,16 @@
 
   <div class="cu-form-group">
     <div class="grid col-4 grid-square flex-sub">
-      <div class="bg-img" v-for="(item,index) in images" :key="index" @tap="ViewImage" :data-url="images[index]">
-       <image :src="images[index]" mode="aspectFill"></image>
-        <div class="cu-tag bg-red" @tap.stop="DelImg" :data-index="index">
+      <div class="bg-img" v-for="(item,index) in images" :key="index" bindlongpress="setCoverImage" :data-url="item">
+        <image :src="item" mode="aspectFill"></image>
+        <div class="cu-tag bg-red" v-if="item == coverImage" :style="{right: 'unset'}">
+          封面
+        </div>
+        <div class="cu-tag bg-red" @tap.stop="delImage" :data-url="item">
           <text class="cuIcon-close"></text>
         </div>
+        
+        
       </div>
       <div class="solids" @tap="chooseImage" v-if="images.length<8">
         <text class="cuIcon-cameraadd"></text>
@@ -138,11 +147,16 @@
     </div>
   </div>
 
-  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">提交</button>
+  <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}" @tap="submit">提交</button>
+
+  <modal :show.sync="showModal" :title="modalInfo.title" :body="modalInfo.body" :confirmEvent="modalInfo.confirmEvent" />
 </template>
 
 <script>
   import wepy from '@wepy/core'
+  import eventHub from '../../common/eventHub'
+  import { createPost, uploadPostImage } from '../../common/api'
+  const WeValidator = require('we-validator')
 
   wepy.page({
     data: {
@@ -155,22 +169,181 @@
       livings: null,
       toilets: null,
       tenants: null,
+      location: null,
+      availableFrom: null,
       // others
+      modalInfo: null,
+      coverImage: null,
+      showModal: false,
       leaseTypes: ["整租", "分租"],
       leaseTypeIndex: null,
       paymentTypes: ["押一付一", "押一付三", "押一付六", "押一年付", "押二付一", "其它"],
       paymentTypeIndex: null,
     },
+    computed: {
+      now() {
+        let date = new Date
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        return [year, "0" + month, day].join('-')
+      },
+      end() {
+        let date = new Date
+        date.setDate(date.getDate() + (7 * 4 * 6));
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        return [year, "0" + month, day].join('-')
+      }
+    },
     methods: {
-      createPost(e){
-        console.log(e);
+      setCoverImage(e) {
+        this.coverImage = e.currentTarget.dataset.url
       },
+
+      initValidator() {
+        this.validatorInstance = new WeValidator({
+          rules: {
+            title: {
+              required: true
+            },
+            body: {
+              required: true
+            },
+            location: {
+              required: true
+            },
+            rent: {
+              required: true,
+              number: true,
+              range: [1, 100000]
+            },
+            rooms: {
+              required: true,
+              number: true
+            },
+            livings: {
+              required: true,
+              number: true
+            },
+            toilets: {
+              required: true,
+              number: true
+            },
+            availableFrom: {
+              require: true,
+              date: true
+            }
+          },
+          messages: {
+            title: {
+              required: '请填写标题'
+            },
+            body: {
+              required: '请填写简介'
+            },
+            location: {
+              required: '请填写房源地址'
+            },
+            rent: {
+              required: '请填写租金',
+              range: [1, 100000]
+            },
+            rooms: {
+              required: '请填写房间数'
+            },
+            livings: {
+              required: '请填写厅数'
+            },
+            toilets: {
+              required: '请填写厕所数'
+            },
+            availableFrom: {
+              required: '请填写可入住时间',
+              date: '日期不正确'
+            }
+          },
+        })
+      },
+
+      submit(e){
+        let form = {
+          title: this.title,
+          body: this.body,
+          rent: this.rent,
+          rooms: this.rooms,
+          livings: this.livings,
+          toilets: this.toilets,
+          tenants: this.tenants,
+          payment_type: this.paymentTypeIndex,
+          available_from: this.availableFrom,
+          location_attributes: this.location,
+          post_type: 0,
+          lease_type: (this.leaseTypeIndex == 0 ? 'take_house' : 'share_house'),
+        }
+
+        let _this = this
+
+        if (!this.validatorInstance.checkData({
+           ...form,
+          location: (this.location ? this.location.address : null)
+        })) return
+
+        createPost(form).then(post => {
+          _this.images.forEach(function(image) {
+            uploadPostImage(
+              post.id,
+              image, 
+              {cover_image: _this.coverImage == image ? true : false}
+            )
+          });
+        })
+      },
+
+      delImage(e) {
+        let images = this.images
+        images.splice(this.images.indexOf(e.currentTarget.dataset.url), 1)
+        if(e.currentTarget.dataset.url == this.coverImage) {
+          this.coverImage = this.images[0]
+        }
+        this.images = images
+      },
+
+      chooseLocation(e) {
+        wepy.wx.chooseLocation().then((res) => {
+          this.location = {
+            name: res.name,
+            address: res.address,
+            longitude: res.longitude,
+            latitude: res.latitude
+          }
+        }).catch((err) => {
+          wepy.wx.getSetting().then((res) => {
+            if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
+              this.modalInfo = {
+                title: '获取地理位置',
+                body: '获取地理位置将帮助我们为您找到更合适的房源或室友, 请前往权限中心设置',
+                confirmEvent: 'open-setting'
+              }
+              this.showModal = true;    
+            }
+          })
+        })
+      },
+
       setLeaseType(e){
-        this.leaseTypeIndex= e.detail.value;
+        this.leaseTypeIndex= e.$wx.detail.value;
       },
+
       setPaymentType(e){
-        this.paymentTypeIndex = e.detail.value;
+        this.paymentTypeIndex = e.$wx.detail.value;
       },
+
+      dateChange(e){
+        this.availableFrom = e.$wx.detail.value
+      },
+
       chooseImage(e){
         wepy.wx.chooseImage({
           count: 8,
@@ -183,7 +356,14 @@
       }
     },
     onLoad() {
-
+      this.initValidator();
+      eventHub.$on('modal-close', ()=>{
+        this.showModal = false;
+      }),
+      eventHub.$on('modal-confirm', ()=>{
+        this.showModal = false;
+        eventHub.$emit("open-setting");
+      })
     }
   });
 </script>
@@ -192,7 +372,7 @@
   {
     navigationBarTitleText: '发布房源',
     usingComponents: {
-
+      modal: "~components/modal"
     }
   }
 </config>
