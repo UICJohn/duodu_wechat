@@ -102,11 +102,11 @@
   subPackages:[
     {
       root: 'pages/home',
-      pages: ['housemate', 'cities', 'postDetail', 'house']
+      pages: ['cities', 'postDetail', 'house', 'housemate']
     },
     {
       root: 'pages/account',
-      pages: [ 'email', 'phone', 'school', 'profile', 'blackList']
+      pages: ['email', 'phone', 'school', 'profile', 'blackList']
     },
     {
       root: 'pages/share/',

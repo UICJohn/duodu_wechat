@@ -20,12 +20,24 @@
       </div>
     </div>
 
+    <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', top: 0, zIndex: 999,opacity: 1, width: '100%', position:'sticky'}">
+      {{error ? '提交失败' : '提交成功'}}
+    </div>
+    
     <div class="cu-form-group margin-top">
       <div class="title">
         标题
         <span class="require">*</span>
       </div>
-      <input type="text" style="height: 26.25px; line-height: 26.25px;" placeholder="简单介绍一下"/>
+      <input type="text" v-model="title" style="height: 26.25px; line-height: 26.25px;" placeholder="简单介绍一下"/>
+    </div>
+
+    <div class="cu-form-group align-start">
+      <div class="title">
+        简介
+        <span class="require">*</span>
+      </div>
+      <textarea v-model="body" placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..."></textarea>
     </div>
 
     <div class="cu-form-group">
@@ -33,30 +45,39 @@
         位置
         <span class="require">*</span>
       </div>
-      <input disabled="true" placeholder="选择地点或者小区">
+      <input disabled="1" placeholder="选择地点或者小区" v-model="location.address" @tap="chooseLocation">
       <div class="action">
-        <div class="cuIcon-right text-grey"></div>
+        <div class="cuIcon-right"></div>
       </div>
     </div>
 
+    <div class="cu-form-group">
+      <div class="title">
+        入住人数
+        <span class="require">*</span>
+      </div>
+      <input v-model="tenants" name="tenant" style="width: 50rpx" type="number"/>
+      <div class="action">
+        人
+      </div>
+    </div>
 
     <div class="cu-form-group">
       <div class="title">
         范围
       </div>
-      <select>
-        <div>
-          <div class="picker">
-            3km
-          </div>
+      <picker bindchange="setRange" value="{{rangeIndex}}" range="{{ranges}}">
+        <div class="picker">
+          {{ranges[rangeIndex] || '设置范围'}}
         </div>
-      </select>
+      </picker>
     </div>
+
 
     <div class="cu-form-group">
       <div class="title">入住时间</div>
-      <picker mode="date" :value="availableFrom" :start="now">
-        <div class="picker">{{availableFrom || now}}</div>
+      <picker mode="date" :value="availableFrom" :start="now" :end="end" bindchange="dateChange">
+        <div class="picker">{{availableFrom || 'YY-MM-DD'}}</div>
       </picker>
     </div>
 
@@ -64,15 +85,15 @@
       <div class="title">
         租金范围
       </div>
-      <input name="min_rent" type="number" placeholder="最低" :style="{width: '20px', textAlign: 'center'}"/>
+      <input name="min_rent" v-model="minRent" type="number" placeholder="最低" :style="{width: '20px', textAlign: 'center'}"/>
       -
-      <input name="max_rent" type="number" placeholder="最高" :style="{width: '20px', textAlign: 'center'}"/>
+      <input name="max_rent" type="number" v-model="maxRent" placeholder="最高" :style="{width: '20px', textAlign: 'center'}"/>
       <div class="footer">
         元/月
       </div>
     </div>
 
-    <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}">
+    <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}" @tap="submit">
       提交
     </button>
   </div>
@@ -80,10 +101,24 @@
 
 <script>
   import wepy from '@wepy/core'
+  import eventHub from '../../common/eventHub'
+  import { createPost } from '../../common/api'
+  const WeValidator = require('we-validator')
 
   wepy.page({
     data: {
-      availableFrom: null
+      // form
+      title: null,
+      body: null,
+      location: null,
+      availableFrom: null,
+      minRent: null,
+      maxRent: null,
+      rangeIndex: null,
+      // other
+      ranges: ['1km内', '2km内', '5km内', '10km内', '不限' ],
+      showStatus: false,
+      error: null,
     },
     computed: {
       now() {
@@ -92,10 +127,126 @@
         let month = date.getMonth() + 1
         let day = date.getDate()
         return [year, "0" + month, day].join('-')
+      },
+      end() {
+        let date = new Date
+        date.setDate(date.getDate() + (7 * 4 * 6));
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        return [year, "0" + month, day].join('-')
+      }
+    },
+
+    methods: {
+      showStatusBar(){
+        this.showStatus = true
+        let _this = this;
+        setTimeout(function(){
+          _this.showStatus = false
+        }, 2000);
+      },
+      submit(e) {
+        let form = {
+          title: this.title,
+          body: this.body,
+          location_attributes: this.location,
+          available_from: this.availableFrom,
+          min_rent: this.minRent,
+          max_rent: this.maxRent,
+          range: this.rangeIndex,
+          post_type: 1,
+          tenants: this.tenants
+        }
+        let _this = this
+        if (!this.validatorInstance.checkData({
+           ...form,
+          location: (this.location ? this.location.address : null)
+        })) return
+        createPost(form).then(post => {
+          _this.showStatusBar();
+          setTimeout(function(){
+            wepy.wx.navigateBack(1);
+          }, 2000);
+        })
+      },
+      chooseLocation(e) {
+        wepy.wx.chooseLocation().then((res) => {
+          this.location = {
+            name: res.name,
+            address: res.address,
+            longitude: res.longitude,
+            latitude: res.latitude
+          }
+        }).catch((err) => {
+          wepy.wx.getSetting().then((res) => {
+            if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
+              this.modalInfo = {
+                title: '获取地理位置',
+                body: '获取地理位置将帮助我们为您找到更合适的房源或室友, 请前往权限中心设置',
+                confirmEvent: 'open-setting'
+              }
+              this.showModal = true;    
+            }
+          })
+        })
+      },
+      initValidator() {
+        this.validatorInstance = new WeValidator({
+          rules: {
+            title: {
+              required: true
+            },
+            body: {
+              required: true
+            },
+            location: {
+              required: true
+            },
+            availableFrom: {
+              require: true,
+              date: true
+            },
+            tenants: {
+              required: true
+            }
+          },
+          messages: {
+            title: {
+              required: '请填写标题'
+            },
+            body: {
+              required: '请填写简介'
+            },
+            location: {
+              required: '请填写房源地址'
+            },
+            availableFrom: {
+              required: '请填写入住日期',
+              date: '日期格式不正确'
+            },
+            tenants: {
+              required: '请填写入住人数'
+            }
+          },
+        })
+      },
+      dateChange(e){
+        this.availableFrom = e.$wx.detail.value
+      },
+      setRange(e) {
+        this.rangeIndex = e.$wx.detail.value;
       }
     },
     onLoad() {
-
+      this.initValidator();
+      eventHub.$on('modal-close', ()=>{
+        this.showModal = false;
+      }),
+      eventHub.$on('modal-confirm', ()=>{
+        this.showModal = false;
+        eventHub.$emit("open-setting");
+      })
     }
   });
 </script>
