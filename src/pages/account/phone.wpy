@@ -19,6 +19,10 @@
     </div>
   </div>
 
+  <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', top: 0, zIndex: 999,opacity: 1, width: '100%', position:'sticky'}">
+    {{error ? '提交失败' : '提交成功'}}
+  </div>
+
   <div class="cu-form-group margin-top-sm">
     <div class="title">
       手机号码
@@ -42,9 +46,6 @@
   </div>
 
   <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}" @tap="submit">提交</button>
-  <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', bottom: 0, width: '100%', position:'absolute'}">
-    {{error ? error : '提交成功'}}
-  </div>
 </template>
 
 <script>

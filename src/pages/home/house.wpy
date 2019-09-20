@@ -18,7 +18,9 @@
       </div>
     </div>
   </div>
-
+  <div v-if="showStatus" class="{{'bg-' + (error ? 'red' : 'green')}}" data-class="slide-top" :style="{textAlign: 'center', top: 0, zIndex: 999,opacity: 1, width: '100%', position:'sticky'}">
+    {{error ? '提交失败' : '提交成功'}}
+  </div>
   <div class="cu-form-group margin-top">
     <div class="title">
       标题
@@ -138,8 +140,6 @@
         <div class="cu-tag bg-red" @tap.stop="delImage" :data-url="item">
           <text class="cuIcon-close"></text>
         </div>
-        
-        
       </div>
       <div class="solids" @tap="chooseImage" v-if="images.length<8">
         <text class="cuIcon-cameraadd"></text>
@@ -150,6 +150,7 @@
   <button class="cu-btn bg-blue margin-tb-sm lg" :style="{width: '90%', marginLeft: '20px'}" @tap="submit">提交</button>
 
   <modal :show.sync="showModal" :title="modalInfo.title" :body="modalInfo.body" :confirmEvent="modalInfo.confirmEvent" />
+
 </template>
 
 <script>
@@ -179,6 +180,8 @@
       leaseTypeIndex: null,
       paymentTypes: ["押一付一", "押一付三", "押一付六", "押一年付", "押二付一", "其它"],
       paymentTypeIndex: null,
+      showStatus: true,
+      error: null
     },
     computed: {
       now() {
@@ -248,7 +251,6 @@
             },
             rent: {
               required: '请填写租金',
-              range: [1, 100000]
             },
             rooms: {
               required: '请填写房间数'
@@ -298,7 +300,19 @@
               {cover_image: _this.coverImage == image ? true : false}
             )
           });
+          _this.showStatusBar();
+          setTimeout(function(){
+            wepy.wx.navigateBack(1);
+          }, 2000);
         })
+      },
+
+      showStatusBar(){
+        this.showStatus = true
+        let _this = this;
+        setTimeout(function(){
+          _this.showStatus = false
+        }, 2000);
       },
 
       delImage(e) {
