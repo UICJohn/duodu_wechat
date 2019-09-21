@@ -149,7 +149,6 @@ const fetchSchools = (key) => {
   })
 }
 
-
 const createPost = (data) => {
   return new Promise((resolve, reject)=>{
     fetchTokenHeader().then((header) => {
@@ -160,8 +159,24 @@ const createPost = (data) => {
         method: 'POST'
       }).then(res => {
         resolve(res.data.post);
-      }).catch(res => {
-        reject(res);
+      }).catch(err => {
+        reject(err);
+      })
+    })
+  })
+}
+
+const fetchPost = (filters = {}) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header)=>{
+      request({
+        url: host + '/v1/posts',
+        header: header,
+        method: 'GET'
+      }).then(res => {
+        resolve(res.data.posts);
+      }).catch(err => {
+        reject(err);
       })
     })
   })
@@ -176,5 +191,6 @@ module.exports = {
   sendCode: sendCode,
   updateEmail: updateEmail,
   updatePhone: updatePhone,
-  uploadPostImage: uploadPostImage
+  uploadPostImage: uploadPostImage,
+  fetchPost: fetchPost
 }

@@ -30,9 +30,9 @@ const errorHanlder = (res) => {
 }
 
 const userMapping = (userInfo) => {
-  if (userInfo && userInfo.nickname) {
+  if (userInfo && userInfo.nickName) {
     let user_info = {
-      username: userInfo.nickname,
+      username: userInfo.nickName,
       gender: userInfo.gender,
       city: userInfo.city,
       province: userInfo.province,

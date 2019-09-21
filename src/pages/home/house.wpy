@@ -180,7 +180,7 @@
       leaseTypeIndex: null,
       paymentTypes: ["押一付一", "押一付三", "押一付六", "押一年付", "押二付一", "其它"],
       paymentTypeIndex: null,
-      showStatus: true,
+      showStatus: false,
       error: null
     },
     computed: {
@@ -281,8 +281,7 @@
           payment_type: this.paymentTypeIndex,
           available_from: this.availableFrom,
           location_attributes: this.location,
-          post_type: 0,
-          lease_type: (this.leaseTypeIndex == 0 ? 'take_house' : 'share_house'),
+          post_type: (this.leaseTypeIndex == 0 ? 'take_house' : 'share_house'),
         }
 
         let _this = this

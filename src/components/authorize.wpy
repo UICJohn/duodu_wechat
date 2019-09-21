@@ -60,6 +60,8 @@
 <script>
   import wepy from "@wepy/core"
   import eventHub from '../common/eventHub';
+  import { userMapping } from '../common/utils';
+
   wepy.component({
     props: {
       redirectTo: String,
@@ -71,20 +73,10 @@
 
     methods: {
       getUserInfo: function(e) {
-        console.log(this)
-        console.log("isTab = " + this.redirectToTab);
         if (e.$wx.detail.rawData){
-          // console.log(e.$wx.detail.rawData);
-          eventHub.$emit('sync-user', e.$wx.detail.rawData);
-          if(this.redirectTo && !this.redirectToTab){
-            wepy.wx.redirectTo({
-              url: this.redirectTo
-            })
-          } else if(this.redirectTo && this.redirectToTab) {
-            wepy.wx.switchTab({
-              url: this.redirectTo
-            })
-          }
+          let profiles = userMapping(JSON.parse(e.$wx.detail.rawData));
+          eventHub.$emit('sync-user', profiles);
+          eventHub.$emit('confirm');
         } else {
           console.log(e.$wx.detail);
         }

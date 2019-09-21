@@ -7,19 +7,23 @@
     title="多度找室友"
     logo="/assets/images/logo.png"
     access="获取您的公开信息 (昵称，头像，地区及性别)"
-    :redirectTo="redirectTo"
-    redirectToTab="true"
   />
 </template>
 
 <script>
   import wepy from '@wepy/core'
+  import eventHub from '../../common/eventHub'
+
   wepy.page({
     data: {
-      redirectTo: null
+      redirectTo: null,
+      redirectToTab: null,
     },
     onLoad() {
-      this.redirectTo = 'index'
+      let _this = this;
+      eventHub.$on('confirm', () => {
+        wepy.wx.navigateBack(1)
+      })
     }
   });
 </script>

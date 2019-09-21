@@ -22,52 +22,68 @@
     height: 40px;
     background-color: #fff;
   }
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-item: center;
+  }
+
+  .container{
+    height: 500px;
+  }
 </style>
 
 <template>
-  <div class="flex align-center top padding-sm">
-    <div class="row margin-sm" @tap="navigateTo" data-path="home/cities">
-      <text class="text-sm"> {{location.city}} </text>
-      <span class="cuIcon-unfold" :style="{paddingTop: '5rpx', marginLeft: '2rpx'}" />
-    </div>
-    <div class="input-group bg-gray sm margin-xs radius" :style="{paddingTop: '4rpx'}">
-      <div class="cuIcon-search" :style="{paddingTop: '6rpx', paddintBottom: '4rpx', paddingLeft: '10rpx'}"/>
-      <input disabled="true" placeholder="{{location.name || '搜索地址或小区名'}}" class="paddint-sm" :style="{paddingLeft: '4rpx', width: '195px'}" @tap="chooseLocation"/>
-    </div>
-    <div class="flex align-center margin-sm">
-      <div class="cu-btn block bg-blue sm radius" @tap="newPost">
-        <span class="iconfont icon-send" :style="{fontSize: '16px', marginRight: '5rpx'}"/>
-        <text :style="{fontSize: '14px'}">发布</text>
+  <div class="container">
+    <div class="flex align-center top padding-sm" :style="{position: 'sticky', top: 0, zIndex: 999}" >
+      <div class="row margin-sm" @tap="navigateTo" data-path="home/cities">
+        <text class="text-sm"> {{location.city}} </text>
+        <span class="cuIcon-unfold" :style="{paddingTop: '5rpx', marginLeft: '2rpx'}" />
       </div>
-    </div>
-  </div>
-
-  <div class="content">
-    <card :posts="posts" clickImageEvent="show-post"/>
-  </div>
-  <modal :show.sync="showModal" :title="modalInfo.title" :body="modalInfo.body" :confirmEvent="modalInfo.confirmEvent" />
-
-  <div class="cu-modal" :class="{'show': postModal}">
-
-    <div class="cu-dialog">
-      <div class="cu-bar bg-white justify-end">
-        <div class="content">选择帖子类型</div>
-        <div class="action">
-          <div class="cuIcon-close text-red" @tap="postModal = false">
-            <span></span>
-          </div>
+      <div class="input-group bg-gray sm margin-xs radius" :style="{paddingTop: '4rpx'}">
+        <div class="cuIcon-search" :style="{paddingTop: '6rpx', paddintBottom: '4rpx', paddingLeft: '10rpx'}"/>
+        <input disabled="true" placeholder="{{location.name || '搜索地址或小区名'}}" class="paddint-sm" :style="{paddingLeft: '4rpx', width: '195px'}" @tap="chooseLocation"/>
+      </div>
+      <div class="flex align-center margin-sm">
+        <div class="cu-btn block bg-blue sm radius" @tap="newPost">
+          <span class="iconfont icon-send" :style="{fontSize: '16px', marginRight: '5rpx'}"/>
+          <text :style="{fontSize: '14px'}">发布</text>
         </div>
       </div>
-      <div class="block">
-        <div class="cu-list menu text-left">
-          <div class="cu-item">
-            <div class="flex justify-between align-center flex-sub" data-path="home/house" @tap="navigateTo">
-              <div class="flex-sub">发布房源</div>              
+    </div>
+
+    <button class="column cu-btn icon bg-blue shadow" :style="{position: 'fixed', bottom: '40px', width: '50px', height: '50px', zIndex: 999, float: 'right', right: '20px'}">
+      <span class="cuIcon-filter"/>
+      <text class="text-sm">筛选</text>
+    </button>
+
+    <scroll-view class="content">
+      <card :posts="posts" clickImageEvent="show-post"/>
+    </scroll-view>
+
+    <modal :show.sync="showModal" :title="modalInfo.title" :body="modalInfo.body" :confirmEvent="modalInfo.confirmEvent" />
+
+    <div class="cu-modal" :class="{'show': postModal}">
+      <div class="cu-dialog">
+        <div class="cu-bar bg-white justify-end">
+          <div class="content">选择帖子类型</div>
+          <div class="action">
+            <div class="cuIcon-close text-red" @tap="postModal = false">
+              <span></span>
             </div>
           </div>
-          <div class="cu-item">
-            <div class="flex justify-between align-center flex-sub" data-path="home/housemate" @tap="navigateTo">
-              <div class="flex-sub">发帖找室友</div>
+        </div>
+        <div class="block">
+          <div class="cu-list menu text-left">
+            <div class="cu-item">
+              <div class="flex justify-between align-center flex-sub" data-path="home/house" @tap="navigateTo">
+                <div class="flex-sub">发布房源</div>              
+              </div>
+            </div>
+            <div class="cu-item">
+              <div class="flex justify-between align-center flex-sub" data-path="home/housemate" @tap="navigateTo">
+                <div class="flex-sub">发帖找室友</div>
+              </div>
             </div>
           </div>
         </div>
@@ -80,7 +96,8 @@
   import wepy from '@wepy/core';
   import eventHub from '../common/eventHub';
   import { mapState } from '@wepy/x';
-  import { getLocationByGeo } from '../common/map'
+  import { fetchPost } from '../common/api';
+  import { getLocationByGeo } from '../common/map';
 
   wepy.page({
 
@@ -96,15 +113,108 @@
       posts: [
         {
           id: 1,
+          tag: '整租',
           title: '三里屯好房出租',
+          post_type: 'take_house',
           timestamp: '2小时前',
           body: '不抽烟喝酒烫头',
-          rent_type: '整租',
+          address: '三里屯',
+          rent: '2000',
+          livings: 2,
+          bedrooms: 3,
+          toilets: 2,
+          images: [
+            {
+              id: 1,
+              url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg'
+            }
+          ],
+          user: {
+            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
+            username: "糯米鸡",
+            gender: 'male'
+          }
+        },
+        {
+          id: 1,
+          title: '三里屯好房出租',
+          timestamp: '2小时前',
+          post_type: 'share_house',
+          body: '不抽烟喝酒烫头',
+          tenants: 2,
+          rent: '900',
+          tag: '合租',
           address: '三里屯',
           livings: 2,
           bedrooms: 3,
           toilets: 2,
-          attachments: [
+          images: [
+            {
+              id: 1,
+              url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg'
+            }
+          ],
+          user: {
+            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
+            username: "糯米鸡",
+            gender: 'male'
+          }
+        },
+        {
+          id: 1,
+          title: '三里屯好房出租',
+          timestamp: '2小时前',
+          body: '不抽烟喝酒烫头',
+          tag: '整租',
+          post_type: 'take_house',
+          address: '三里屯',
+          rent: '1500',
+          livings: 2,
+          bedrooms: 3,
+          toilets: 2,
+          images: [
+            {
+              id: 1,
+              url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg'
+            }
+          ],
+          user: {
+            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
+            username: "糯米鸡",
+            gender: 'male'
+          }
+        },
+        {
+          id: 1,
+          title: '三里屯好房出租',
+          timestamp: '2小时前',
+          body: '不抽烟喝酒烫头',
+          tag: '找室友',
+          address: '三里屯',
+          post_type: 'housemate',
+          tenants: 1,
+          livings: 2,
+          bedrooms: 3,
+          toilets: 2,
+          user: {
+            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
+            username: "糯米鸡",
+            gender: 'male'
+          }
+        },
+        {
+          id: 1,
+          title: '三里屯好房出租',
+          timestamp: '2小时前',
+          post_type: 'take_house',
+          body: '不抽烟喝酒烫头不抽烟喝酒烫头不抽烟喝酒烫头不抽烟喝酒烫头不抽烟喝酒烫头不抽烟喝酒烫头',
+          tag: '整租',
+          rent: '5200',
+          address: '三里屯',
+          livings: 2,
+          bedrooms: 3,
+          toilets: 2,
+          images: [
             {
               id: 1,
               url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg'
@@ -116,9 +226,38 @@
             gender: 'male'
           }
         }
-      ]
+      ],
+      filters: {
+        page: 0
+      },
     },
     methods: {
+      regEvents(){
+        eventHub.$on('modal-confirm', ()=>{
+          this.showModal = false;
+          eventHub.$emit("open-setting");
+        });
+        eventHub.$on('modal-close', ()=>{
+          this.showModal = false;
+        });
+        eventHub.$on('select-city', (res)=> {
+          this.location = res;
+        });
+        eventHub.$on('show-post', (res) => {
+          this.$navigate('postDetail', [res.id]);
+        });
+        eventHub.$on('refresh', (res) => {
+          if(res && res.filters){
+            this.filters = {
+              ...this.filters,
+              ...res.filters
+            }
+          }
+          fetchPost(this.filters).then(posts => {
+            this.posts = posts
+          })
+        })
+      },
       chooseLocation(e) {
         wepy.wx.chooseLocation().then((res) => {
           this.location = {
@@ -144,25 +283,28 @@
                 body: '获取地理位置将帮助我们为您找到更合适的房源或室友, 请前往权限中心设置',
                 confirmEvent: 'open-setting'
               }
-              this.showModal = true;    
+              this.showModal = true;
             }
           })
         })
       },
 
       newPost(e) {
-        // wepy.wx.getSetting().then((res) => {
-        //   if(!res.authSetting["scope.userInfo"]) {
-            
-        //   }
-        // }).catch((err) => {
-        //   console.log(err);
-        // })
-        // wx.navigateTo({
-        //   url: 'post'
-        // })
-        this.postModal = true
+        let _this = this
+        wx.getSetting({
+          success(res) {
+            if(!res.authSetting["scope.userInfo"]) {
+              _this.$navigate('share/authorize')
+            }else {
+              _this.postModal = true;
+            }
+          },
+          fail(err){
+            eventHub.$emit('wx-error', err);
+          }
+        })
       },
+
       navigateTo(e) {
         wepy.wx.navigateTo(e.currentTarget.dataset.path).then((res) => {
           this.postModal = false;
@@ -171,19 +313,8 @@
     },
 
     onLoad() {
-      eventHub.$on('modal-confirm', ()=>{
-        this.showModal = false;
-        eventHub.$emit("open-setting");
-      });
-      eventHub.$on('modal-close', ()=>{
-        this.showModal = false;
-      });
-      eventHub.$on('select-city', (res)=> {
-        this.location = res;
-      });
-      eventHub.$on('show-post', (res) => {
-        this.$navigate('postDetail', [res.id]);
-      })
+      this.regEvents();
+      eventHub.$emit('refresh');
     }
   });
 </script>
