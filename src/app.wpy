@@ -59,6 +59,7 @@
         eventHub.$on('auth-user', () => {          
           authenticate().then((res) => {
             wepy.wx.setStorageSync('accessToken', res.header["Authorization"])
+            eventHub.$emit('authencated');
           });
         });
 
@@ -141,5 +142,10 @@
       }
     ]
   },
+  permission: {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于查找房源"
+    }
+  }
 }
 </config>
