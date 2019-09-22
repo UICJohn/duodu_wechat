@@ -144,7 +144,7 @@
   },
   permission: {
     "scope.userLocation": {
-      "desc": "你的位置信息将用于查找房源"
+      "desc": "你的位置信息将用于查找房源和室友"
     }
   }
 }
