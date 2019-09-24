@@ -1,0 +1,151 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .title {
+    text-align: left;
+  }
+
+  .circle{
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+  }
+</style>
+
+<template>
+  <div class="cu-modal bottom-modal" :class="{'show': show}" :style="{textAlign: 'center', zIndex: 12}">
+    <div class="cu-dialog">
+      <div class="cu-bar bg-white solid-bottom">
+        <div class="action text-grey" v-on:click="show = false">
+          取消
+        </div>
+        <div class="action text-blue">
+          确定
+        </div>
+      </div>
+      <div class="bg-white">
+        <div class="padding-lr padding-tb-sm text-grey title">
+          <span class="cuIcon-order"/>
+          排序
+        </div>
+        <div class="grid col-3 padding-lr padding-bottom solid-bottom">
+          <div class="padding-tb-xs text-gray">
+            价格
+            <span class="iconfont icon-down text-green"/>
+          </div>
+          <div class="padding-tb-xs text-gray">
+            更新时间
+            <span class="iconfont icon-down text-green"/>
+          </div>
+          <div class="padding-tb-xs text-gray">
+            距离
+            <span class="iconfont icon-up text-red"/>
+          </div>
+        </div>
+        <div class="padding-lr padding-tb-sm text-grey title">
+          <span class="cuIcon-tag"/>
+          查找类型
+        </div>
+        <div class="flex grid col-5 padding-lr padding-bottom">
+          <div class="column">
+            <circleBtn icon="cuIcon-friend"/>
+            <text class="margin-bottom-xs text-grey text-df">室友</text>
+          </div>
+          <div class="column">
+            <circleBtn icon="iconfont icon-house"/>
+            <text class="margin-bottom-xs text-grey text-df">房源</text>
+          </div>
+          <div class="column">
+            <circleBtn icon="iconfont icon-elevator"/>
+            <text class="margin-bottom-xs text-grey text-df">电梯</text>
+          </div>
+          <div class="column">
+            <circleBtn icon="iconfont icon-cooktop"/>
+            <text class="margin-bottom-xs text-grey text-df">可做饭</text>
+          </div>
+          <div class="column">
+            <circleBtn icon="iconfont icon-appliance"/>
+            <text class="margin-bottom-xs text-grey text-df">带家电</text>
+          </div>
+        </div>
+        <div class="flex grid col-5 padding-lr padding-bottom solid-bottom">
+          <div class="column">
+            <circleBtn icon="iconfont icon-furniture"/>
+            <text class="text-grey text-df">带家具</text>
+          </div>
+        </div>
+
+        <div class="padding-lr padding-tb-sm text-grey title">
+          <span class="iconfont icon-floor_plan"/>
+          户型
+        </div>
+        <div class="flex grid col-3 padding-lr padding-tb-sm solid-bottom">
+          <div class="flex align-center">
+            <span class="margin-right-xs iconfont icon-livings"/>
+            <number min="0" max="5" value="0" step="1"/>
+          </div>
+          <div class="flex align-center">
+            <span class="margin-right-xs iconfont icon-toilets"/>
+            <number min="0" max="5" value="0" step="1"/>
+          </div>
+          <div class="flex align-center">
+            <span class="margin-right-xs iconfont icon-bedrooms"/>
+            <number min="0" max="10" value="0" step="1"/>
+          </div>
+        </div>
+
+        <div class="padding-lr padding-tb-sm text-grey title">
+          <span class="cuIcon-moneybag"/>
+          租金范围
+        </div>
+        <div class="flex padding-lr padding-bottom justify-around solid-bottom">
+          <div class="flex">
+            <text class="margin-right-sm">最低</text>
+            <number min="500" max="100000" value="500" step="100"/>
+          </div>
+          <div class="flex">
+            <text class="margin-left-lg margin-right-sm">最高</text>
+            <number min="500" max="100000" value="2000" step="100"/>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import wepy from "@wepy/core"
+  import eventHub from '../common/eventHub';
+  import { stringToBoolean } from '../common/utils';
+
+  wepy.component({
+    props: {
+      show:{
+        type: Boolean,
+        default: true,
+        coerce: stringToBoolean()
+      }
+    },
+    methods: {
+
+    }
+  })
+</script>
+<config>
+  {
+    usingComponents: {
+      number: "./numberInput",
+      circleBtn: "./circleBtn"
+    }
+  }
+</config>

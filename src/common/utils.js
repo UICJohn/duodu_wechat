@@ -1,6 +1,30 @@
 import eventHub from './eventHub';
 import wepy from '@wepy/core';
 
+export const numberValidator = (min, max) =>{
+  return (v) => {
+    let valid = true, num = Number(v);
+    if (isNaN(num)) {
+      valid = false;
+    }
+    if (min !== undefined) {
+      valid = valid && num >= min;
+    }
+    if (max !== undefined) {
+      valid = valid && num <= max;
+    }
+    return valid;
+  };
+};
+
+export const stringToBoolean = () =>{
+  return (v) => {
+    if (typeof v === 'string' && (v === '0' || v === 'false'))
+      return false;
+    return !!v;
+  };
+};
+
 const request = (options) => {
   return new Promise((resolve, reject) => {
     wepy.wx.request({ ...options }).then((res) => {
@@ -46,5 +70,7 @@ const userMapping = (userInfo) => {
 
 module.exports = {
   userMapping: userMapping,
-  request: request
+  request: request,
+  numberValidator: numberValidator,
+  stringToBoolean: stringToBoolean 
 }

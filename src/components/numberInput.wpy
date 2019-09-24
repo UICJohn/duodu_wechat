@@ -1,0 +1,103 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  input {
+    border: 1rpx solid #8799a3;
+    width: 40px;
+    height: 20px;
+  }
+
+  .action {
+    height: 22px;
+    padding: 3px;
+  }
+
+  .action.minus{
+    border-left: 1rpx solid #8799a3;
+    border-top: 1rpx solid #8799a3;
+    border-bottom: 1rpx solid #8799a3;
+  }
+
+  .action.add{
+    border-right: 1rpx solid #8799a3;
+    border-top: 1rpx solid #8799a3;
+    border-bottom: 1rpx solid #8799a3;
+  }
+</style>
+
+<template>
+  <div class="flex align-center">
+    <div class="action minus" @tap="minus">
+      <span class="cuIcon-move"></span>
+    </div>
+    <input disabled="1" :value="value" type="number" @change="change"/>
+    <div class="action add" @tap="add">
+      <span class="cuIcon-add"></span>
+    </div>
+  </div>
+</template>
+
+<script>
+  import wepy from '@wepy/core';
+  import { numberValidator } from '../common/utils';
+  import eventHub from '../common/eventHub';
+
+  wepy.component({
+    props: {
+      'min': {
+        type: Number,
+        default: 0,
+        validator: numberValidator()
+      },
+      'max': {
+        type: Number,
+        default: 100,
+        validator: numberValidator()
+      },
+      'value':{
+        type: Number,
+        validator: numberValidator()
+      },
+      'step': {
+        type: Number,
+        default: 1,
+        validator: numberValidator()
+      }
+    },
+
+    data: {
+
+    },
+
+    methods: {
+      add(e){
+        this.value += this.step;
+        eventHub.$emit('change');
+      },
+      minus(e){
+        this.value -= this.step;
+        eventHub.$emit('change');
+      },
+      change(e){
+        if(this.$wx.detail && this.value != this.$wx.detail.value){
+          this.value = this.$wx.detail.value;
+          eventHub.$emit('change');
+        }
+      }
+    },
+
+    ready () {
+      if(!this.value){
+        this.value = (this.min + this.max)/2;
+      } else {
+
+      }
+      eventHub.$on('set-value' , (value) => {
+        this.value = value
+      })
+    }
+  })
+</script>

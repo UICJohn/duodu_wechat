@@ -1,0 +1,78 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  .title {
+    text-align: left;
+  }
+
+  .circle{
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    padding: 11px;
+  }
+</style>
+
+<template>
+  <div class="circle" :style="{border: '1rpx solid #33A6B8', color: '#33A6B8', backgroundColor: (actived ? activeBackground : backgroundColor)}" @tap="setStatus">
+    <span class="{{icon}}" :style="{color: (actived ? activeColor : color), fontSize: size + 'px'}"/>
+  </div>
+</template>
+
+<script>
+  import wepy from "@wepy/core"
+  import eventHub from '../common/eventHub';
+  import { stringToBoolean } from '../common/utils';
+
+  wepy.component({
+    props: {
+      size: {
+        type: String,
+        default: '20'
+      },
+      icon: String,
+      actived:{
+        type: Boolean,
+        default: false,
+        coerce: stringToBoolean()
+      },
+      color:{
+        type: String,
+        default: '#33A6B8'
+      },
+      backgroundColor:{
+        type: String,
+        default: '#fff'
+      },
+      activeBackground: {
+        type: String,
+        default: '#33A6B8'
+      },
+      activeColor:{
+        type: String,
+        default: '#fff'
+      },
+      event:{
+        type: String,
+        default: 'tap'
+      }
+    },
+
+    methods: {
+      setStatus(e){
+        this.actived = !this.actived
+        eventHub.$emit(this.event, {actived: this.actived});
+      }
+    }
+  })
+</script>
+<config>
+  {
+    usingComponents: {
+      number: "./numberInput"
+    }
+  }
+</config>
