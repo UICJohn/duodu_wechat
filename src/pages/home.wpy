@@ -1,10 +1,4 @@
 <style lang="less">
-  @import "~assets/css/animation.wxss";
-  @import "~assets/css/main.wxss";
-  @import "~assets/css/icon.wxss";
-  @import "~assets/css/iconfont.wxss";
-  
-
   page{
     background-color: #eee;
   }
@@ -27,7 +21,7 @@
   .column {
     display: flex;
     flex-direction: column;
-    align-item: center;
+    align-items: center;
   }
 
   .row {
@@ -45,17 +39,17 @@
     </div>
     <div class="input-group bg-gray sm margin-xs radius" :style="{paddingTop: '4rpx'}">
       <div class="cuIcon-search" :style="{paddingTop: '6rpx', paddintBottom: '4rpx', paddingLeft: '10rpx'}"/>
-      <input disabled="true" placeholder="{{location.name || '搜索地址或小区名'}}" class="paddint-sm" :style="{paddingLeft: '4rpx', width: '195px'}" @tap="chooseLocation"/>
+      <input disabled="1" placeholder="{{location.name || '搜索宇宙'}}" class="paddint-sm" :style="{paddingLeft: '4rpx', width: '195px'}" @tap="chooseLocation"/>
     </div>
     <div class="flex align-center margin-sm">
-      <div class="cu-btn block bg-blue sm radius" @tap="newPost">
+      <div class="cu-btn block bg-gradual-blue sm radius" @tap="newPost">
         <span class="iconfont icon-send" :style="{fontSize: '16px', marginRight: '5rpx'}"/>
         <text :style="{fontSize: '14px'}">发布</text>
       </div>
     </div>
   </div>
 
-  <button class="column cu-btn icon bg-blue shadow" :style="{position: 'fixed', bottom: '40px', width: '50px', height: '50px', zIndex: 10, float: 'right', right: '20px'}" v-on:click="setFilter = true">
+  <button class="column cu-btn icon bg-gradual-blue shadow" :style="{position: 'fixed', bottom: '40px', width: '50px', height: '50px', zIndex: 10, float: 'right', right: '20px'}" v-on:click="setFilter = true">
     <span class="cuIcon-filter"/>
     <text class="text-sm">筛选</text>
   </button>
@@ -92,13 +86,43 @@
       </div>
     </div>
   </div>
-  <filters :show="setFilter"/>
+  <div class="cu-modal bottom-modal" :class="{'show': setFilter}" style="text-align: center; z-index: 12">
+    <div class="cu-dialog">
+      <div class="cu-bar bg-white solid-bottom">
+        <div class="action text-grey" v-on:click="cancel">
+          取消
+        </div>
+        <div class="action text-blue">
+          确定
+        </div>
+      </div>
+      <div class="bg-white nav">
+        <div class="flex text-center solid-bottom">
+          <div class="cu-item flex-sub" :class="{'text-orange': filterType=='common', 'cur': filterType=='common' }"  @tap="filterType='common'">
+            常用
+          </div>
+          <div class="cu-item flex-sub" :class="{'text-orange': filterType=='area', 'cur': filterType=='area' }" @tap="filterType='area'">
+            区域
+          </div>
+          <div class="cu-item flex-sub" :class="{'text-orange': filterType=='metros', 'cur': filterType=='metros' }" @tap="filterType='metros'">
+            交通
+          </div>
+          <!-- <div class="cu-item flex-sub" :class="{'text-orange': filterType=='intel', 'cur': filterType=='intel' }" @tap="filterType='intel'">
+            智能
+          </div> -->
+        </div>
+      </div>
+      <scroll-view scroll-y="1" style="height: 400px">
+        <commonFilters v-if="filterType=='common'"/>
+        <areaFilters v-if="filterType=='area'" v-bind:region="location.city"/>
+      </scroll-view>
+    </div>
+  </div>
 </template>
 
 <script>
   import wepy from '@wepy/core';
   import eventHub from '../common/eventHub';
-  import { mapState } from '@wepy/x';
   import { fetchPost } from '../common/api';
   import { getLocationByGeo } from '../common/map';
 
@@ -113,123 +137,8 @@
       showModal: false,
       postModal: false,
       modalInfo: {},
-      posts: [
-        {
-          id: 1,
-          tag: '整租',
-          title: '三里屯好房出租',
-          post_type: 'take_house',
-          timestamp: '2小时前',
-          body: '不抽烟喝酒烫头',
-          address: '三里屯',
-          rent: '2000',
-          livings: 2,
-          bedrooms: 3,
-          toilets: 2,
-          images: [
-            {
-              id: 1,
-              url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg'
-            }
-          ],
-          user: {
-            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
-            username: "糯米鸡",
-            gender: 'male'
-          }
-        },
-        {
-          id: 1,
-          title: '三里屯好房出租',
-          timestamp: '2小时前',
-          post_type: 'share_house',
-          body: '不抽烟喝酒烫头',
-          tenants: 2,
-          rent: '900',
-          tag: '合租',
-          address: '三里屯',
-          livings: 2,
-          bedrooms: 3,
-          toilets: 2,
-          images: [
-            {
-              id: 1,
-              url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg'
-            }
-          ],
-          user: {
-            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
-            username: "糯米鸡",
-            gender: 'male'
-          }
-        },
-        {
-          id: 1,
-          title: '三里屯好房出租',
-          timestamp: '2小时前',
-          body: '不抽烟喝酒烫头',
-          tag: '整租',
-          post_type: 'take_house',
-          address: '三里屯',
-          rent: '1500',
-          livings: 2,
-          bedrooms: 3,
-          toilets: 2,
-          images: [
-            {
-              id: 1,
-              url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg'
-            }
-          ],
-          user: {
-            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
-            username: "糯米鸡",
-            gender: 'male'
-          }
-        },
-        {
-          id: 1,
-          title: '三里屯好房出租',
-          timestamp: '2小时前',
-          body: '不抽烟喝酒烫头',
-          tag: '找室友',
-          address: '三里屯',
-          post_type: 'housemate',
-          tenants: 1,
-          livings: 2,
-          bedrooms: 3,
-          toilets: 2,
-          user: {
-            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
-            username: "糯米鸡",
-            gender: 'male'
-          }
-        },
-        {
-          id: 1,
-          title: '三里屯好房出租',
-          timestamp: '2小时前',
-          post_type: 'take_house',
-          body: '不抽烟喝酒烫头不抽烟喝酒烫头不抽烟喝酒烫头不抽烟喝酒烫头不抽烟喝酒烫头不抽烟喝酒烫头',
-          tag: '整租',
-          rent: '5200',
-          address: '三里屯',
-          livings: 2,
-          bedrooms: 3,
-          toilets: 2,
-          images: [
-            {
-              id: 1,
-              url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg'
-            }
-          ],
-          user: {
-            avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big21002.jpg",
-            username: "糯米鸡",
-            gender: 'male'
-          }
-        }
-      ],
+      posts:[],
+      filterType: 'area',
       filters: {
         page: 0
       },
@@ -261,9 +170,9 @@
             this.posts = posts
           })
         })
-      },
-      setRent(e) {
-        console.log(e);
+        eventHub.$on('close-filters', (refresh) => {
+          this.setFilter = false
+        })
       },
       chooseLocation(e) {
         wepy.wx.chooseLocation().then((res) => {
@@ -294,6 +203,9 @@
             }
           })
         })
+      },
+      cancel(e){
+        this.setFilter = false;
       },
       newPost(e) {
         let _this = this
@@ -330,7 +242,8 @@
     usingComponents: {
       card: "~components/card",
       modal: "~components/modal",
-      filters: "~components/filters"
+      commonFilters: "~components/commonFilters",
+      areaFilters: "~components/areaFilters"
     }
   }
 </config>

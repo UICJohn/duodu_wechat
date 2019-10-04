@@ -1,9 +1,6 @@
 <style lang="less">
-  @import "~assets/css/animation.wxss";
-  @import "~assets/css/main.wxss";
   @import "~assets/css/icon.wxss";
   @import "~assets/css/iconfont.wxss";
-
   .title {
     text-align: left;
   }
@@ -12,13 +9,24 @@
     border-radius: 50%;
     width: 45px;
     height: 45px;
-    padding: 11px;
+    padding-top: 9px;
+    padding-left: 1rpx;
+  }
+  .radius{
+    border-radius: 5px;
+    min-width: 50px;
+    padding: 10px;
   }
 </style>
 
 <template>
-  <div class="circle" :style="{border: '1rpx solid #33A6B8', color: '#33A6B8', backgroundColor: (actived ? activeBackground : backgroundColor)}" @tap="setStatus">
-    <span class="{{icon}}" :style="{color: (actived ? activeColor : color), fontSize: size + 'px'}"/>
+  <div class="{{btnType}}" :style="{border: '1rpx solid #33A6B8', color: '#33A6B8', backgroundColor: (actived ? activeBackground : backgroundColor)}" @tap="setStatus">
+    <block v-if="icon">
+      <span class="{{icon}}" :style="{color: (actived ? activeColor : color), fontSize: size + 'px'}"/>
+    </block>
+    <block v-else>
+      <text :style="{color: (actived ? activeColor : color), fontSize: size + 'px'}">{{text}}</text>
+    </block>
   </div>
 </template>
 
@@ -29,11 +37,16 @@
 
   wepy.component({
     props: {
+      icon: String,
+      text: String,
+      btnType: {
+        type: String,
+        default: 'circle'
+      },
       size: {
         type: String,
         default: '20'
       },
-      icon: String,
       actived:{
         type: Boolean,
         default: false,
@@ -69,10 +82,3 @@
     }
   })
 </script>
-<config>
-  {
-    usingComponents: {
-      number: "./numberInput"
-    }
-  }
-</config>

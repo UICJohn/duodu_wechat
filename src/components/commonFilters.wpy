@@ -1,0 +1,181 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .title {
+    text-align: left;
+  }
+</style>
+
+<template>  
+  <div class="padding-lr padding-tb-sm text-grey title">
+    <span class="cuIcon-order"/>
+    排序
+  </div>
+  <div class="grid col-3 padding-lr padding-bottom solid-bottom">
+    <div class="solid-right padding-tb-xs {{priceUp ? 'text-white bg-blue' : 'bg-gray text-grey'}}" v-on:click="priceUp = !priceUp" style="text-align: center">
+      价格
+      <span class="iconfont {{priceUp ? 'text-white icon-up' : 'icon-down'}}"/>
+    </div>
+    <div class="padding-tb-xs {{timeUp ? 'text-white bg-blue' : 'bg-gray text-grey'}}" v-on:click="timeUp = !timeUp" style="text-align: center">
+      更新时间
+      <span class="iconfont {{timeUp ? 'text-white icon-up' : 'icon-down'}}"/>
+    </div>
+    <div class="solid-left padding-tb-xs {{distanceUp ? 'text-white bg-blue' : 'bg-gray text-grey'}}" v-on:click="distanceUp = !distanceUp" style="text-align: center">
+      距离
+      <span class="iconfont {{distanceUp ? 'text-white icon-up' : 'icon-down'}}"/>
+    </div>
+  </div>
+
+  <div class="padding-lr padding-tb-sm text-grey title">
+    <span class="cuIcon-moneybag"/>
+    租金范围
+  </div>
+  <div class="flex padding-tb padding-lr-lg solid-bottom">
+    <text class="margin-left-lg">￥</text>
+    <input type="number" placeholder="最低" :style="{width: '80px', borderBottom: '1rpx solid'}" />
+    <text class="margin-lr">-</text>
+    <text>￥</text>
+    <input type="number" placeholder="最高" :style="{width: '80px', borderBottom: '1rpx solid'}" />
+  </div>
+
+  <div class="padding-lr padding-tb-sm text-grey title">
+    <span class="cuIcon-tag"/>
+    查找类型
+  </div>
+  <div class="flex grid col-5 padding-lr padding-bottom">
+    <div class="column">
+      <activeBtn icon="cuIcon-friend"/>
+      <text class="margin-bottom-xs text-grey text-df">室友</text>
+    </div>
+    <div class="column">
+      <activeBtn icon="iconfont icon-house" activeColor="#ffffff"/>
+      <text class="margin-bottom-xs text-grey text-df">房源</text>
+    </div>
+    <div class="column">
+      <activeBtn icon="iconfont icon-elevator" activeColor="#ffffff"/>
+      <text class="margin-bottom-xs text-grey text-df">电梯</text>
+    </div>
+    <div class="column">
+      <activeBtn icon="iconfont icon-cooktop" activeColor="#ffffff"/>
+      <text class="margin-bottom-xs text-grey text-df">可做饭</text>
+    </div>
+    <div class="column">
+      <activeBtn icon="iconfont icon-appliance" activeColor="#ffffff"/>
+      <text class="margin-bottom-xs text-grey text-df">带家电</text>
+    </div>
+  </div>
+  <div class="flex grid col-5 padding-lr padding-bottom solid-bottom">
+    <div class="column">
+      <activeBtn icon="iconfont icon-furniture"/>
+      <text class="text-grey text-df">带家具</text>
+    </div>
+    <div class="column">
+      <activeBtn icon="cuIcon-male"/>
+      <text class="text-grey text-df">只看帅哥</text>
+    </div>
+    <div class="column">
+      <activeBtn icon="cuIcon-female"/>
+      <text class="text-grey text-df">只看美女</text>
+    </div>
+  </div>
+
+  <div class="padding-lr padding-tb-sm text-grey title">
+    <span class="iconfont icon-floor_plan"/>
+    户型
+  </div>
+  <div class="flex align-center padding-tb-sm">
+    <div class="margin-left" >
+      <span class="iconfont icon-livings" style="font-size: 24px"/>
+      大厅
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="1"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="2"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="3"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="4+"/>
+    </div>
+  </div>
+  <div class="flex align-center padding-tb-sm">
+    <div class="margin-left" >
+      <span class="iconfont icon-bedrooms" style="font-size: 24px"/>
+      卧室
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="1"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="2"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="3"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="4+"/>
+    </div>
+  </div>
+  <div class="flex align-center padding-tb-sm solid-bottom">
+    <div class="margin-left" >
+      <span class="iconfont icon-toilets" style="font-size: 24px"/>
+      厕所
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="1"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="2"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="3"/>
+    </div>
+    <div class="margin-left">
+      <activeBtn btnType="radius" text="4+"/>
+    </div>
+  </div>
+
+  <div class="flex justify-center margin-tb">
+    <div class="cu-btn bg-gradual-red block" style="width: 80%">
+      重置
+    </div>
+  </div>
+</template>
+
+<script>
+  import wepy from "@wepy/core"
+  import eventHub from '../common/eventHub';
+  import { stringToBoolean } from '../common/utils';
+
+  wepy.component({
+    props: {
+
+    },
+    data: {
+      timeUp: false,
+      priceUp: false,
+      distanceUp: false
+    },
+    methods: {
+      
+    }
+  })
+</script>
+<config>
+  {
+    usingComponents: {
+      activeBtn: "./activeBtn"
+    }
+  }
+</config>

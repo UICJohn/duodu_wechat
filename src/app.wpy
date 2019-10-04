@@ -1,4 +1,9 @@
 <style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
   .thumb {
     overflow: hidden;
     border-radius: 50%;
@@ -97,16 +102,15 @@
   pages: [
     'pages/home',
     'pages/account',
-    'pages/activity',
     'pages/message',
   ],
   subPackages:[
     {
-      root: 'pages/home',
+      root: 'pages/home/',
       pages: ['cities', 'postDetail', 'house', 'housemate']
     },
     {
-      root: 'pages/account',
+      root: 'pages/account/',
       pages: ['email', 'phone', 'school', 'profile', 'blackList']
     },
     {
@@ -127,6 +131,12 @@
         text: "首页",
         iconPath: "./assets/images/home.png",
         selectedIconPath: "./assets/images/home_selected.png"
+      },
+      {
+        pagePath: "pages/home",
+        text: "附近",
+        iconPath: "./assets/images/radar.png",
+        selectedIconPath: "./assets/images/radar_selected.png"
       },
       {
         pagePath: "pages/message",

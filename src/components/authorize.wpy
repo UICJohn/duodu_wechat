@@ -1,7 +1,4 @@
 <style lang="less">
-  @import "~assets/css/animation.wxss";
-  @import "~assets/css/main.wxss";
-  @import "~assets/css/icon.wxss";
   page {
     background-color: #fff;
   }

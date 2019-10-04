@@ -66,6 +66,20 @@ const updateEmail = (data) => {
   })
 }
 
+const fetchSuburbs = (region) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: host + "/v1/suburbs",
+        method: 'GET',
+        data: {region: region},
+        header: header
+      }).then(res => {
+        resolve(res.data.suburbs)
+      })
+    })
+  })
+}
 
 const updatePhone = (data) => {
   return new Promise((resolve, reject) => {
@@ -75,7 +89,7 @@ const updatePhone = (data) => {
         method: 'PUT',
         data: data,
         header: header
-      }).then(res => {
+      }).then(res => {$
         resolve(res);
       })
     })
@@ -192,5 +206,6 @@ module.exports = {
   updateEmail: updateEmail,
   updatePhone: updatePhone,
   uploadPostImage: uploadPostImage,
-  fetchPost: fetchPost
+  fetchPost: fetchPost,
+  fetchSuburbs: fetchSuburbs
 }

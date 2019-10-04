@@ -1,0 +1,141 @@
+<style lang="less">
+  @import "~assets/css/animation.wxss";
+  @import "~assets/css/main.wxss";
+  @import "~assets/css/icon.wxss";
+  @import "~assets/css/iconfont.wxss";
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .title {
+    text-align: left;
+  }
+
+  .vertical-nav.nav {
+    width: 250rpx;
+    white-space: initial;
+  }
+
+</style>
+
+<wxs module="m1" lang="babel">
+  const suburbSelected = (selectedSuburbs, suburb) => {
+    return (selectedSuburbs.indexOf(suburb) !== -1);
+  }
+  module.exports.suburbSelected = suburbSelected;
+</wxs>
+
+<template>
+  <div class="flex">
+    <div class="vertical-nav nav bg-gray solid-right" scroll-y scroll-with-animation scroll-top="{{VerticalNavTop}}" style="height:calc(100vh - 420rpx)">
+      <div class="solid-bottom cu-item {{index==selectedTab?'text-blue cur':''}}" v-for="(item, index) in tabs" wx:key @tap="selectedTab=index" data-id="{{index}}">
+        {{item.name}}
+      </div>
+    </div>
+    <scroll-view scroll-y="1" scroll-with-animation style="height:calc(100vh - 420rpx)">
+      <block v-for="(item, index) in distanceArray" v-if="selectedTab==0">
+        <div class="block bg-white padding-tb-sm solid-bottom" @tap="distance=index">
+          <text>{{item}}</text>
+          <span class="padding-left-sm cuIcon-check text-green" v-if="distance == index"/>
+        </div>  
+      </block>
+
+      <block v-if="selectedTab==1">
+        <div class="block bg-white padding-tb-sm solid-bottom" data-name="0" @tap="selectSuburbs">
+          <text>不限</text>
+          <span class="padding-left-sm cuIcon-check text-green" v-if="m1.suburbSelected(selectedSuburbs, '0')"/>
+        </div>
+        <block v-for="(item, index) in suburbs">
+          <div class="block bg-white padding-tb-sm solid-bottom" :data-name="item.name" @tap="selectSuburbs">
+            <text>{{item.name}}</text>
+            <span class="padding-left-sm cuIcon-check text-green" v-if="m1.suburbSelected(selectedSuburbs, item.name)"/>
+          </div>  
+        </block>
+      </block>
+
+    </scroll-view>
+  </div>
+  <div class="flex justify-center padding-tb-sm bg-white">
+    <div class="cu-btn bg-gradual-red block" style="width: 80%">
+      重置
+    </div>
+  </div>
+
+</template>
+
+<script>
+  import wepy from "@wepy/core";
+  import eventHub from '../common/eventHub';
+  import { fetchSuburbs } from '../common/api';
+  wepy.component({
+    props: {
+      region: {
+        type: String,
+        default: '北京市'
+      }
+    },
+    data: {
+      filterIndex: 0,
+      distance: null,
+      selectedTab: 1,
+      suburbs: [],
+      selectedSuburbs: [],
+      distanceArray: ['不限', '1km', '2km', '3km', '4km', '5km'],
+      tabs: [
+        {
+          name: "附近"
+        }, 
+        {
+          name: "商圈"
+        },
+        {
+          name: "常用地址"
+        }
+      ]
+    },
+    methods: {
+      selectSuburbs(e) {
+        let suburbsArray = this.selectedSuburbs
+        let suburb = e.currentTarget.dataset.name
+        console.log(suburb)
+        if(suburbsArray.includes(suburb)) {
+          suburbsArray = suburbsArray.filter(el => el !== suburb);
+        } else {
+          suburbsArray.push(suburb)
+          if(suburb == "0"){
+            suburbsArray = suburbsArray.filter(el => el === "0");
+          } else {
+            suburbsArray = suburbsArray.filter(el => el !== "0");
+          }
+        }
+        this.selectedSuburbs = suburbsArray
+      },
+
+      tabSelect(e){
+        this.filterIndex = e.currentTarget.dataset.id
+      }
+    },
+    ready(){
+      eventHub.$on('select-city', (res)=> {
+        fetchSuburbs(res.city).then(suburbs => {
+          this.selectedSuburbs = [];
+          this.suburbs = suburbs
+        })  
+      });
+
+      fetchSuburbs(this.region).then(suburbs => {
+        this.suburbs = suburbs
+      })
+    }
+  })
+</script>
+<config>
+  {
+    usingComponents: {
+      activeBtn: "./activeBtn"
+    }
+  }
+</config>

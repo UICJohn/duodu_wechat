@@ -1,8 +1,4 @@
 <style lang="less">
-  @import "~assets/css/animation.wxss";
-  @import "~assets/css/main.wxss";
-  @import "~assets/css/icon.wxss";
-  @import "~assets/css/iconfont.wxss";
   .top {
     width: 100%;
     height: 250px;
