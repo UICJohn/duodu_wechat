@@ -25,17 +25,24 @@
   const suburbSelected = (selectedSuburbs, suburb) => {
     return (selectedSuburbs.indexOf(suburb) !== -1);
   }
-  module.exports.suburbSelected = suburbSelected;
+  const stationsSelected = (selectedStations, station) => {
+    return (selectedStations.indexOf(station) !== -1);
+  }
+
+  module.exports = {
+    suburbSelected: suburbSelected,
+    stationsSelected: stationsSelected
+  }
 </wxs>
 
 <template>
   <div class="flex">
-    <div class="vertical-nav nav bg-gray solid-right" scroll-y scroll-with-animation scroll-top="{{VerticalNavTop}}" style="height:calc(100vh - 420rpx)">
+    <div class="vertical-nav nav bg-gray solid-right" scroll-y scroll-with-animation scroll-top="{{VerticalNavTop}}" style="height:calc(100vh - 500rpx); width: 150px">
       <div class="solid-bottom cu-item {{index==selectedTab?'text-blue cur':''}}" v-for="(item, index) in tabs" wx:key @tap="selectedTab=index" data-id="{{index}}">
         {{item.name}}
       </div>
     </div>
-    <scroll-view scroll-y="1" scroll-with-animation style="height:calc(100vh - 420rpx)">
+    <scroll-view class="bg-white solid-right" scroll-y="1" scroll-with-animation style="height:calc(100vh - 500rpx)">
       <block v-for="(item, index) in distanceArray" v-if="selectedTab==0">
         <div class="block bg-white padding-tb-sm solid-bottom" @tap="distance=index">
           <text>{{item}}</text>
@@ -44,18 +51,38 @@
       </block>
 
       <block v-if="selectedTab==1">
-        <div class="block bg-white padding-tb-sm solid-bottom" data-name="0" @tap="selectSuburbs">
+        <div class="block bg-white padding-tb-sm solid-bottom" data-name="0" @tap="selectSuburb">
           <text>不限</text>
           <span class="padding-left-sm cuIcon-check text-green" v-if="m1.suburbSelected(selectedSuburbs, '0')"/>
         </div>
         <block v-for="(item, index) in suburbs">
-          <div class="block bg-white padding-tb-sm solid-bottom" :data-name="item.name" @tap="selectSuburbs">
+          <div class="block bg-white padding-tb-sm solid-bottom" :data-name="item.name" @tap="selectSuburb">
             <text>{{item.name}}</text>
             <span class="padding-left-sm cuIcon-check text-green" v-if="m1.suburbSelected(selectedSuburbs, item.name)"/>
           </div>  
         </block>
       </block>
 
+      <block v-if="selectedTab==2">
+        <block v-for="(item, index) in subways">
+          <div class="block bg-white padding-tb-sm solid-bottom" :data-name="item.name" :data-idx="index" @tap="setStations">
+            <text>{{item.name}}</text>
+            <span class="cuIcon-title text-green" v-if="subway===item.name"/>
+          </div>  
+        </block>
+      </block>
+    </scroll-view>
+    <scroll-view scroll-y="1" v-if="selectedTab==2" style="height:calc(100vh - 500rpx)">
+      <div class="block bg-white padding-tb-sm solid-bottom" data-name="0" @tap="selectStation">
+        <text>不限</text>
+        <span class="padding-left-sm cuIcon-check text-green" v-if="m1.stationsSelected(selectedStations, '0')"/>
+      </div>
+      <block v-for="(item, index) in stations">
+        <div class="block bg-white padding-tb-sm solid-bottom" :data-name="item.name" @tap="selectStation">
+          <text>{{item.name}}</text>
+          <span class="padding-left-sm cuIcon-check text-green" v-if="m1.stationsSelected(selectedStations, item.name)"/>
+        </div>  
+      </block>
     </scroll-view>
   </div>
   <div class="flex justify-center padding-tb-sm bg-white">
@@ -69,7 +96,7 @@
 <script>
   import wepy from "@wepy/core";
   import eventHub from '../common/eventHub';
-  import { fetchSuburbs } from '../common/api';
+  import { fetchSuburbs, fetchSubways} from '../common/api';
   wepy.component({
     props: {
       region: {
@@ -81,7 +108,11 @@
       filterIndex: 0,
       distance: null,
       selectedTab: 1,
+      subway: null,
       suburbs: [],
+      subways:[],
+      stations: null,
+      selectedStations: [],
       selectedSuburbs: [],
       distanceArray: ['不限', '1km', '2km', '3km', '4km', '5km'],
       tabs: [
@@ -92,15 +123,18 @@
           name: "商圈"
         },
         {
-          name: "常用地址"
+          name: "交通"
         }
       ]
     },
     methods: {
-      selectSuburbs(e) {
+      setStations(e) {
+        this.subway = e.currentTarget.dataset.name
+        this.stations = this.subways[e.currentTarget.dataset.idx].stations
+      },
+      selectSuburb(e) {
         let suburbsArray = this.selectedSuburbs
         let suburb = e.currentTarget.dataset.name
-        console.log(suburb)
         if(suburbsArray.includes(suburb)) {
           suburbsArray = suburbsArray.filter(el => el !== suburb);
         } else {
@@ -114,6 +148,22 @@
         this.selectedSuburbs = suburbsArray
       },
 
+      selectStation(e) {
+        let stationsArray = this.selectedStations
+        let station = e.currentTarget.dataset.name
+        if(stationsArray.includes(station)) {
+          stationsArray = stationsArray.filter(el => el !== station);
+        } else {
+          stationsArray.push(station)
+          if(station == "0"){
+            stationsArray = stationsArray.filter(el => el === "0");
+          } else {
+            stationsArray = stationsArray.filter(el => el !== "0");
+          }
+        }
+        this.selectedStations = stationsArray
+      },
+
       tabSelect(e){
         this.filterIndex = e.currentTarget.dataset.id
       }
@@ -123,11 +173,22 @@
         fetchSuburbs(res.city).then(suburbs => {
           this.selectedSuburbs = [];
           this.suburbs = suburbs
-        })  
+          this.stations = []
+        })
+
+        fetchSubways(res.city).then(subways=>{
+          this.selectedSubways = [];
+          this.subways = subways;
+          this.stations = subways[0]["stations"]
+        })
       });
 
       fetchSuburbs(this.region).then(suburbs => {
         this.suburbs = suburbs
+      })
+      fetchSubways(this.region).then(subways=>{
+        this.subways = subways;
+        this.stations = subways[0]["stations"]
       })
     }
   })

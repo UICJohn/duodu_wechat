@@ -196,6 +196,24 @@ const fetchPost = (filters = {}) => {
   })
 }
 
+
+const fetchSubways = (city) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: host + '/v1/subways',
+        data: {region: city},
+        header: header,
+        method: 'GET'
+      }).then(res => {
+        resolve(res.data.subways);
+      }).catch(err => {
+        reject(err);
+      })
+    })
+  })
+}
+
 module.exports = {
   authenticate: authenticate,
   createPost: createPost,
@@ -207,5 +225,6 @@ module.exports = {
   updatePhone: updatePhone,
   uploadPostImage: uploadPostImage,
   fetchPost: fetchPost,
-  fetchSuburbs: fetchSuburbs
+  fetchSuburbs: fetchSuburbs,
+  fetchSubways: fetchSubways
 }

@@ -105,14 +105,14 @@
             区域
           </div>
           <div class="cu-item flex-sub" :class="{'text-orange': filterType=='metros', 'cur': filterType=='metros' }" @tap="filterType='metros'">
-            交通
+            常用地址
           </div>
           <!-- <div class="cu-item flex-sub" :class="{'text-orange': filterType=='intel', 'cur': filterType=='intel' }" @tap="filterType='intel'">
             智能
           </div> -->
         </div>
       </div>
-      <scroll-view scroll-y="1" style="height: 400px">
+      <scroll-view scroll-y="1" style="height: calc(100vh - 400rpx)">
         <commonFilters v-if="filterType=='common'"/>
         <areaFilters v-if="filterType=='area'" v-bind:region="location.city"/>
       </scroll-view>
