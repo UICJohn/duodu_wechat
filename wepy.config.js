@@ -1,5 +1,7 @@
 const path = require('path');
 var prod = process.env.NODE_ENV === 'production';
+var staging = process.env.NODE_ENV === 'staging';
+const definePlugin = require('@wepy/plugin-define');
 
 module.exports = {
   wpyExt: '.wpy',
@@ -18,7 +20,7 @@ module.exports = {
   },
   compilers: {
     less: {
-      compress: prod
+      compress: (prod || staging)
     },
     babel: {
       sourceMap: true,
@@ -30,9 +32,13 @@ module.exports = {
       ]
     }
   },
-  plugins: [],
+  static: "/assets",
+  plugins: [
+    definePlugin({
+      BASE_URL: JSON.stringify(staging ? 'http://47.92.125.75' : 'http://192.168.31.224:3000'),
+    })
+  ],
   appConfig: {
-    noPromiseAPI: ['createSelectorQuery'],
-  }
+    noPromiseAPI: ['createSelectorQuery']
+  },
 }
-

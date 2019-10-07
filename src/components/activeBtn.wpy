@@ -1,6 +1,6 @@
 <style lang="less">
-  @import "~assets/css/icon.wxss";
-  @import "~assets/css/iconfont.wxss";
+  @import "../../assets/css/icon.wxss";
+  @import "../../assets/css/iconfont.wxss";
   .title {
     text-align: left;
   }

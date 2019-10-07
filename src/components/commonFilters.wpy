@@ -1,8 +1,8 @@
 <style lang="less">
-  @import "~assets/css/animation.wxss";
-  @import "~assets/css/main.wxss";
-  @import "~assets/css/icon.wxss";
-  @import "~assets/css/iconfont.wxss";
+  @import "../../assets/css/animation.wxss";
+  @import "../../assets/css/main.wxss";
+  @import "../../assets/css/icon.wxss";
+  @import "../../assets/css/iconfont.wxss";
   .column {
     display: flex;
     flex-direction: column;

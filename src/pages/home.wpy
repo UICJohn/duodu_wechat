@@ -104,9 +104,6 @@
           <div class="cu-item flex-sub" :class="{'text-orange': filterType=='area', 'cur': filterType=='area' }" @tap="filterType='area'">
             区域
           </div>
-          <div class="cu-item flex-sub" :class="{'text-orange': filterType=='metros', 'cur': filterType=='metros' }" @tap="filterType='metros'">
-            常用地址
-          </div>
           <!-- <div class="cu-item flex-sub" :class="{'text-orange': filterType=='intel', 'cur': filterType=='intel' }" @tap="filterType='intel'">
             智能
           </div> -->

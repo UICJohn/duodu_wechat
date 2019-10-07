@@ -3,8 +3,9 @@ import eventHub from './eventHub';
 import wepy from '@wepy/core';
 
 // console.log(wepy);
-const host = 'http://192.168.31.224:3000'
+// const BASE_URL = 'http://192.168.31.224:3000'
 
+console.log(BASE_URL)
 
 const fetchTokenHeader = () =>{
   return new Promise((resolve, reject) => {
@@ -21,7 +22,7 @@ const authenticate = () => {
   return new Promise((resolve, reject) => { 
     wepy.wx.login().then((res) => {
       request({
-        url: host + '/users/wechat_auth',
+        url: BASE_URL + '/users/wechat_auth',
         method: 'POST',
         data: { code: res.code },
         header: {'content-type': 'application/json'}
@@ -39,7 +40,7 @@ const sendCode = (data) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header) => {
       request({
-        url: host + "/v1/verification_code",
+        url: BASE_URL + "/v1/verification_code",
         method:'POST',
         data: data,
         header: header
@@ -55,7 +56,7 @@ const updateEmail = (data) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header) => {
       request({
-        url: host + "/v1/profiles/update_email",
+        url: BASE_URL + "/v1/profiles/update_email",
         method: 'PUT',
         data: data,
         header: header
@@ -70,7 +71,7 @@ const fetchSuburbs = (region) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header) => {
       request({
-        url: host + "/v1/suburbs",
+        url: BASE_URL + "/v1/suburbs",
         method: 'GET',
         data: {region: region},
         header: header
@@ -85,7 +86,7 @@ const updatePhone = (data) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header) => {
       request({
-        url: host + "/v1/profiles/update_phone",
+        url: BASE_URL + "/v1/profiles/update_phone",
         method: 'PUT',
         data: data,
         header: header
@@ -100,7 +101,7 @@ const uploadPostImage = (post_id, image_path, data={}) => {
   return new Promise((resolve, reject) => { 
     fetchTokenHeader().then((header) => {
       wepy.wx.uploadFile({
-        url: host + "/v1/posts/" + post_id + "/post/upload_images",
+        url: BASE_URL + "/v1/posts/" + post_id + "/post/upload_images",
         filePath: image_path,
         name: 'attachment',
         formData: data,
@@ -118,7 +119,7 @@ const updateUser = (profiles) => {
   return new Promise((resolve, reject) => {    
     fetchTokenHeader().then((header) => {
       request({
-        url: host + "/v1/profiles",
+        url: BASE_URL + "/v1/profiles",
         data: {profiles: profiles},
         header: header,
         method: 'PUT'
@@ -134,7 +135,7 @@ const fetchUser = () => {
   return new Promise((resolve, reject) => {    
     fetchTokenHeader().then((header) => {
       request({
-        url: host + '/v1/profiles',
+        url: BASE_URL + '/v1/profiles',
         header: header,
         method: 'GET'
       }).then((res) => {
@@ -150,7 +151,7 @@ const fetchSchools = (key) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header) => {
       request({
-        url: host + "/v1/schools",
+        url: BASE_URL + "/v1/schools",
         header: header,
         data: {key: key},
         method: 'GET'
@@ -167,7 +168,7 @@ const createPost = (data) => {
   return new Promise((resolve, reject)=>{
     fetchTokenHeader().then((header) => {
       request({
-        url: host + '/v1/posts',
+        url: BASE_URL + '/v1/posts',
         header: header,
         data: { post: data },
         method: 'POST'
@@ -184,7 +185,7 @@ const fetchPost = (filters = {}) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header)=>{
       request({
-        url: host + '/v1/posts',
+        url: BASE_URL + '/v1/posts',
         header: header,
         method: 'GET'
       }).then(res => {
@@ -201,7 +202,7 @@ const fetchSubways = (city) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header) => {
       request({
-        url: host + '/v1/subways',
+        url: BASE_URL + '/v1/subways',
         data: {region: city},
         header: header,
         method: 'GET'

@@ -1,8 +1,8 @@
 <style lang="less">
-  @import "~assets/css/animation.wxss";
-  @import "~assets/css/main.wxss";
-  @import "~assets/css/icon.wxss";
-  @import "~assets/css/iconfont.wxss";
+  @import "../../assets/css/animation.wxss";
+  @import "../../assets/css/main.wxss";
+  @import "../../assets/css/icon.wxss";
+  @import "../../assets/css/iconfont.wxss";
 
   .column {
     display: flex;
@@ -123,14 +123,15 @@
           name: "商圈"
         },
         {
-          name: "交通"
+          name: "地铁"
         }
       ]
     },
     methods: {
       setStations(e) {
-        this.subway = e.currentTarget.dataset.name
-        this.stations = this.subways[e.currentTarget.dataset.idx].stations
+        this.subway = e.currentTarget.dataset.name;
+        this.selectedStations = [];
+        this.stations = this.subways[e.currentTarget.dataset.idx].stations;
       },
       selectSuburb(e) {
         let suburbsArray = this.selectedSuburbs
@@ -179,6 +180,7 @@
         fetchSubways(res.city).then(subways=>{
           this.selectedSubways = [];
           this.subways = subways;
+          this.subway = subway[0].name
           this.stations = subways[0]["stations"]
         })
       });
@@ -188,6 +190,7 @@
       })
       fetchSubways(this.region).then(subways=>{
         this.subways = subways;
+        this.subway = subways[0].name
         this.stations = subways[0]["stations"]
       })
     }
