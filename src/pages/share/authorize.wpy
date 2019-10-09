@@ -5,7 +5,7 @@
 <template>
   <authorize
     title="多度找室友"
-    logo="/assets/images/logo.png"
+    logo="https://duodu-1259595042.cos.ap-chengdu.myqcloud.com/assets/images/logo.png"
     access="获取您的公开信息 (昵称，头像，地区及性别)"
   />
 </template>

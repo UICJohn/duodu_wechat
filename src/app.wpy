@@ -102,6 +102,7 @@
   pages: [
     'pages/home',
     'pages/account',
+    'pages/nearby',
     'pages/message',
   ],
   subPackages:[
@@ -133,7 +134,7 @@
         selectedIconPath: "./assets/images/home_selected.png"
       },
       {
-        pagePath: "pages/home",
+        pagePath: "pages/nearby",
         text: "附近",
         iconPath: "./assets/images/radar.png",
         selectedIconPath: "./assets/images/radar_selected.png"

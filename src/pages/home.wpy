@@ -139,7 +139,7 @@
       filters: {
         page: 0
       },
-      setFilter: true,
+      setFilter: false,
     },
     methods: {
       regEvents(){
