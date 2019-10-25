@@ -2,11 +2,6 @@ import { request } from './utils'
 import eventHub from './eventHub';
 import wepy from '@wepy/core';
 
-// console.log(wepy);
-// const BASE_URL = 'http://192.168.31.224:3000'
-
-console.log(BASE_URL)
-
 const fetchTokenHeader = () =>{
   return new Promise((resolve, reject) => {
     wepy.wx.getStorage({key: 'accessToken'})
@@ -101,7 +96,7 @@ const uploadPostImage = (post_id, image_path, data={}) => {
   return new Promise((resolve, reject) => { 
     fetchTokenHeader().then((header) => {
       wepy.wx.uploadFile({
-        url: BASE_URL + "/v1/posts/" + post_id + "/post/upload_images",
+        url: BASE_URL + "/v1/posts/" + post_id + "/upload_images",
         filePath: image_path,
         name: 'attachment',
         formData: data,
@@ -181,7 +176,7 @@ const createPost = (data) => {
   })
 }
 
-const fetchPost = (filters = {}) => {
+const fetchPosts = (filters = {}) => {
   return new Promise((resolve, reject) => {
     fetchTokenHeader().then((header)=>{
       request({
@@ -225,7 +220,7 @@ module.exports = {
   updateEmail: updateEmail,
   updatePhone: updatePhone,
   uploadPostImage: uploadPostImage,
-  fetchPost: fetchPost,
+  fetchPosts: fetchPosts,
   fetchSuburbs: fetchSuburbs,
   fetchSubways: fetchSubways
 }

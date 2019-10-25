@@ -167,32 +167,33 @@
 
       tabSelect(e){
         this.filterIndex = e.currentTarget.dataset.id
-      }
-    },
-    ready(){
-      eventHub.$on('select-city', (res)=> {
-        fetchSuburbs(res.city).then(suburbs => {
-          this.selectedSuburbs = [];
+      },
+
+      syncFilters(region) {
+        this.stations = []
+        this.selectedSuburbs = [];
+        fetchSuburbs(region).then(suburbs => {
           this.suburbs = suburbs
-          this.stations = []
         })
-
-        fetchSubways(res.city).then(subways=>{
-          this.selectedSubways = [];
+        fetchSubways(region).then(subways=>{
           this.subways = subways;
-          this.subway = subway[0].name
+          this.subway = subways[0].name
           this.stations = subways[0]["stations"]
-        })
-      });
+        })  
+      },
 
-      fetchSuburbs(this.region).then(suburbs => {
-        this.suburbs = suburbs
-      })
-      fetchSubways(this.region).then(subways=>{
-        this.subways = subways;
-        this.subway = subways[0].name
-        this.stations = subways[0]["stations"]
-      })
+      regEvent() {
+        eventHub.$on('select-city', (res)=> {
+          this.syncFilters(res.city);
+        });
+        eventHub.$on('authencated', () => {
+          this.syncFilters(this.region)
+        });
+      },
+    },
+    attached(){
+      this.regEvent();
+      this.syncFilters(this.region);
     }
   })
 </script>

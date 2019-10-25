@@ -105,6 +105,18 @@
     </picker>
   </div>
 
+  <div class="cu-form-group">
+    <div class="title">
+      住宅类型
+      <span class="require">*</span>  
+    </div>
+    <picker bindchange="setPropertyType" value="{{propertyTypeIndex}}" range-key="name" range="{{propertyTypes}}">
+      <div class="picker">
+        {{ propertyTypeIndex ? propertyTypes[propertyTypeIndex].name : '住宅类型' }}
+      </div>
+    </picker>
+  </div>
+
   <div class="cu-form-group" v-if="leaseTypeIndex==1">
     <div class="title">
       已入住
@@ -116,6 +128,65 @@
     </div>
   </div>
   
+
+  <div class="cu-bar bg-white margin-top">
+    <div class="action">
+      房屋状况
+    </div>
+  </div>
+  <div class="grid col-4 padding-lr padding-bottom bg-white">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="iconfont icon-internet" attrName="hasNetwork"/>
+      <text class="text-grey text-sm">网络</text>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="iconfont icon-appliance" attrName="hasAppliance"/>
+      <text class="text-grey text-sm">家电</text>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="iconfont icon-furniture" attrName="hasFurniture"/>
+      <text class="text-grey text-sm">家具</text>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="iconfont icon-cooktop" attrName="hasCookTop"/>
+      <text class="text-grey text-sm">炉灶</text>
+    </div>
+  </div>
+  <div class="grid col-4 padding-lr padding-bottom bg-white">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="iconfont icon-elevator" attrName="hasElevator"/>
+      <text class="text-grey text-sm">电梯</text>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="iconfont icon-aircon" attrName="hasAirConditioner"/>
+      <text class="text-grey text-sm">空调</text>
+    </div>
+  </div>
+
+  <div class="cu-bar bg-white margin-top">
+    <div class="action">
+      房客要求
+    </div>
+  </div>
+  <div class="grid col-4 padding-lr padding-bottom bg-white">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="iconfont icon-cigarette" attrName="smokeAllow"/>
+      <text class="text-grey text-sm">可以抽烟</text>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="iconfont icon-pet" attrName="petsAllow"/>
+      <text class="text-grey text-sm">可以养宠物</text>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="cuIcon-female" attrName="allowFemale"/>
+      <text class="text-grey text-sm">只租女生</text>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <activeBtn icon="cuIcon-male" attrName="allowMale"/>
+      <text class="text-grey text-sm">只租男生</text>
+    </div>
+  </div>
+
   <div class="cu-bar bg-white margin-top">
     <div class="action">
       图片上传
@@ -127,9 +198,9 @@
 
   <div class="cu-form-group">
     <div class="grid col-4 grid-square flex-sub">
-      <div class="bg-img" v-for="(item,index) in images" :key="index" bindlongpress="setCoverImage" :data-url="item">
+      <div class="bg-img" v-for="(item, index) in images" :key="index" bindlongpress="setCoverImage" :data-url="item">
         <image :src="item" mode="aspectFill"></image>
-        <div class="cu-tag bg-red" v-if="item == coverImage" :style="{right: 'unset'}">
+        <div class="cu-tag bg-red" v-if="item == coverImage" style="right: unset">
           封面
         </div>
         <div class="cu-tag bg-red" @tap.stop="delImage" :data-url="item">
@@ -158,6 +229,14 @@
     data: {
       // form
       images: [],
+      smokeAllow: false,
+      petsAllow: false,
+      hasAirConditioner: false,
+      hasFurniture: false,
+      hasElevator: false,
+      hasCookTop: false,
+      hasAppliance: false,
+      hasNetwork: false,
       title: null,
       body: null,
       rent: null,
@@ -167,6 +246,7 @@
       tenants: null,
       location: null,
       availableFrom: null,
+
       // others
       modalInfo: null,
       coverImage: null,
@@ -174,6 +254,21 @@
       leaseTypes: ["整租", "分租"],
       leaseTypeIndex: null,
       paymentTypes: ["押一付一", "押一付三", "押一付六", "押一年付", "押二付一", "其它"],
+      propertyTypeIndex: null,
+      propertyTypes: [
+        {
+          name: "别墅",
+          code: 'house'
+        },
+        {
+          name: '工作室',
+          code: 'studio'
+        },
+        {
+          name: '普通住宅',
+          code: 'apartment'
+        }
+      ],
       paymentTypeIndex: null,
       showStatus: false,
       error: null
@@ -200,8 +295,8 @@
         this.coverImage = e.currentTarget.dataset.url
       },
 
-      initValidator() {
-        this.validatorInstance = new WeValidator({
+      initValidator(share_house = false) {
+        let form_validation = {
           rules: {
             title: {
               required: true
@@ -229,9 +324,12 @@
               required: true,
               number: true
             },
-            availableFrom: {
+            available_from: {
               require: true,
               date: true
+            },
+            property_type: {
+              require: true
             }
           },
           messages: {
@@ -256,15 +354,25 @@
             toilets: {
               required: '请填写厕所数'
             },
-            availableFrom: {
+            available_from: {
               required: '请填写可入住时间',
               date: '日期不正确'
+            },
+            property_type: {
+              required: '请填写住宅类型'
             }
           },
-        })
+        }
+
+        if(share_house) {
+          form_validation.rules.tenants = { required: true }
+          form_validation.messages.tenants = { required: '请填写已入住人数' }
+        }
+        return new WeValidator(form_validation)
       },
 
       submit(e){
+        let property_types = ["house", "studio", "apartment"]
         let form = {
           title: this.title,
           body: this.body,
@@ -272,21 +380,34 @@
           rooms: this.rooms,
           livings: this.livings,
           toilets: this.toilets,
-          tenants: this.tenants,
           payment_type: this.paymentTypeIndex,
           available_from: this.availableFrom,
           location_attributes: this.location,
           post_type: (this.leaseTypeIndex == 0 ? 'take_house' : 'share_house'),
+          has_air_conditioner: this.hasAirConditioner,
+          has_furniture: this.hasFurniture,
+          has_elevator: this.hasElevator,
+          has_cook_top:this.hasCookTop,
+          has_appliance: this.hasAppliance,
+          has_network: this.hasNetwork,
+          property_type: this.propertyTypes[this.propertyTypeIndex].code,
+          tenants_gender: this.tenants_gender
         }
 
-        let _this = this
+        if(this.leaseTypeIndex == 1 && this.tenants) {
+          form.tenants = this.tenants
+        }
 
-        if (!this.validatorInstance.checkData({
+        let validator = this.initValidator(this.leaseTypeIndex == 1);
+
+        if (!validator.checkData({
            ...form,
           location: (this.location ? this.location.address : null)
         })) return
 
+        let _this = this
         createPost(form).then(post => {
+          console.log(post);
           _this.images.forEach(function(image) {
             uploadPostImage(
               post.id,
@@ -320,6 +441,7 @@
 
       chooseLocation(e) {
         wepy.wx.chooseLocation().then((res) => {
+          console.log(res);
           this.location = {
             name: res.name,
             address: res.address,
@@ -344,6 +466,10 @@
         this.leaseTypeIndex= e.$wx.detail.value;
       },
 
+      setPropertyType(e) {
+        this.propertyTypeIndex = e.$wx.detail.value;
+      },
+
       setPaymentType(e){
         this.paymentTypeIndex = e.$wx.detail.value;
       },
@@ -364,10 +490,20 @@
       }
     },
     onLoad() {
-      this.initValidator();
       eventHub.$on('modal-close', ()=>{
         this.showModal = false;
-      }),
+      });
+      eventHub.$on('active-btn-click', (res) => {
+        if(res[0] == 'allowFemale'){
+          this.tenants_gender = 'female'
+          eventHub.$emit("change-ab-status", ['allowMale', false])
+        } else if (res[0] == 'allowMale') {
+          this.tenants_gender = 'male'
+          eventHub.$emit("change-ab-status", ['allowFemale', false])
+        } else {
+          this[res[0]] = res[1];
+        }
+      });
       eventHub.$on('modal-confirm', ()=>{
         this.showModal = false;
         eventHub.$emit("open-setting");
@@ -380,7 +516,9 @@
   {
     navigationBarTitleText: '发布房源',
     usingComponents: {
-      modal: "~components/modal"
+      modal: "~components/modal",
+      activeBtn: "~components/activeBtn",
+
     }
   }
 </config>

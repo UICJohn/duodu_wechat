@@ -42,6 +42,7 @@
   import eventHub from './common/eventHub';
   import { userMapping } from './common/utils';
   import { authenticate, fetchUser, updateUser } from './common/api';
+  import { getLocationByGeo } from './common/map';
 
   wepy.use(vuex);
   wepy.use(promisify);
@@ -55,11 +56,32 @@
     onLaunch() {
       // event hanlder
       this.regAppEvents();
-      eventHub.$emit('auth-user');
     },
 
     methods: {
       regAppEvents(){
+
+        eventHub.$on('choose-location', (msg) => {
+          wepy.wx.chooseLocation().then((res) => {
+            let location = res
+            getLocationByGeo(...location).then(({ region }) => {
+              location = {
+                ...location,
+                city: region.ad_info.city,
+                suburb: region.ad_info.district,
+              }
+            }).reject((err) => {
+              eventHub.$emit("wx-error", err);
+            })
+            eventHub.$emit("location-fetched", location);
+          }).catch((err) => {
+            wepy.wx.getSetting().then((res) => {
+              if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
+                eventHub.$emit('open-setting', msg);
+              }
+            })
+          })
+        })
 
         eventHub.$on('auth-user', () => {          
           authenticate().then((res) => {
@@ -69,7 +91,6 @@
         });
 
         eventHub.$on('sync-user', (profiles, $event) => {
-          console.log(profiles)
           if(profiles){
             updateUser(profiles).then((res) => {
               eventHub.$emit('profiles-updated', res.data.user);
@@ -85,7 +106,7 @@
           console.log(err);
         });
 
-        eventHub.$on('open-setting', () => {
+        eventHub.$on('open-setting', (msg) => {
           wepy.wx.openSetting().catch((err) => {
             eventHub.$emit('wx-error', err);
           })

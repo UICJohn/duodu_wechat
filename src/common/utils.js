@@ -42,7 +42,6 @@ const errorHanlder = (res) => {
   return new Promise((resolve, reject) => {
     if (res.statusCode === 401){
       eventHub.$emit('auth-user');
-      eventHub.$emit('server-error', res);
       reject(res);
     } else if([400, 404, 422, 500].includes(res.statusCode)){
       eventHub.$emit('bad-request', res);
@@ -58,10 +57,12 @@ const userMapping = (userInfo) => {
     let user_info = {
       username: userInfo.nickName,
       gender: userInfo.gender,
-      city: userInfo.city,
-      province: userInfo.province,
-      country: userInfo.country,
-      avatar_url: userInfo.avatarUrl
+      avatar_url: userInfo.avatarUrl,
+      // location_attributes: {
+      //   city: userInfo.city,
+      //   province: userInfo.province,
+      //   country: userInfo.country,
+      // }
     }
     return user_info
   }

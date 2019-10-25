@@ -101,12 +101,9 @@
           <div class="cu-item flex-sub" :class="{'text-orange': filterType=='common', 'cur': filterType=='common' }"  @tap="filterType='common'">
             常用
           </div>
-          <div class="cu-item flex-sub" :class="{'text-orange': filterType=='area', 'cur': filterType=='area' }" @tap="filterType='area'">
+          <div class="cu-item flex-sub" :class="{'text-orange cur': filterType=='area'}" @tap="filterType='area'">
             区域
           </div>
-          <!-- <div class="cu-item flex-sub" :class="{'text-orange': filterType=='intel', 'cur': filterType=='intel' }" @tap="filterType='intel'">
-            智能
-          </div> -->
         </div>
       </div>
       <scroll-view scroll-y="1" style="height: calc(100vh - 400rpx)">
@@ -120,8 +117,8 @@
 <script>
   import wepy from '@wepy/core';
   import eventHub from '../common/eventHub';
-  import { fetchPost } from '../common/api';
-  import { getLocationByGeo } from '../common/map';
+  import { fetchPosts } from '../common/api';
+  
 
   wepy.page({
 
@@ -142,64 +139,8 @@
       setFilter: false,
     },
     methods: {
-      regEvents(){
-        eventHub.$on('modal-confirm', ()=>{
-          this.showModal = false;
-          eventHub.$emit("open-setting");
-        });
-        eventHub.$on('modal-close', ()=>{
-          this.showModal = false;
-        });
-        eventHub.$on('select-city', (res)=> {
-          this.location = res;
-        });
-        eventHub.$on('show-post', (res) => {
-          this.$navigate('postDetail', [res.id]);
-        });
-        eventHub.$on('refresh', (res) => {
-          if(res && res.filters){
-            this.filters = {
-              ...this.filters,
-              ...res.filters
-            }
-          }
-          fetchPost(this.filters).then(posts => {
-            this.posts = posts
-          })
-        })
-        eventHub.$on('close-filters', (refresh) => {
-          this.setFilter = false
-        })
-      },
       chooseLocation(e) {
-        wepy.wx.chooseLocation().then((res) => {
-          this.location = {
-            name: res.name,
-            address: res.address,
-            longitude: res.longitude,
-            latitude: res.latitude
-          }
-          getLocationByGeo({longitude: res.longitude, latitude: res.latitude}).then(({ result }) => {
-            this.location = {
-              ...this.location,
-              city: result.ad_info.city,
-              district: result.ad_info.district,
-            }
-          }).reject((err) => {
-            console.log(err);
-          })
-        }).catch((err) => {
-          wepy.wx.getSetting().then((res) => {
-            if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
-              this.modalInfo = {
-                title: '获取地理位置',
-                body: '获取地理位置将帮助我们为您找到更合适的房源或室友, 请前往权限中心设置',
-                confirmEvent: 'open-setting'
-              }
-              this.showModal = true;
-            }
-          })
-        })
+        
       },
       cancel(e){
         this.setFilter = false;
@@ -224,6 +165,39 @@
         wepy.wx.navigateTo(e.currentTarget.dataset.path).then((res) => {
           this.postModal = false;
         })
+      },
+      regEvents(){
+        eventHub.$on('authencated', () => {
+          eventHub.$emit('refresh');
+        }),
+        eventHub.$on('modal-confirm', ()=>{
+          this.showModal = false;
+          eventHub.$emit("open-setting");
+        });
+        eventHub.$on('modal-close', ()=>{
+          this.showModal = false;
+        });
+        eventHub.$on('select-city', (res)=> {
+          this.location = res;
+        });
+        eventHub.$on('show-post', (res) => {
+          this.$navigate('postDetail', [res.id]);
+        });
+        eventHub.$on('refresh', (res) => {
+          if(res && res.filters){
+            this.filters = {
+              ...this.filters,
+              ...res.filters
+            }
+          }
+          fetchPosts(this.filters).then(posts => {
+            console.log(posts);
+            this.posts = posts
+          })
+        });
+        eventHub.$on('close-filters', (refresh) => {
+          this.setFilter = false
+        });
       }
     },
 

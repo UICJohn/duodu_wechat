@@ -185,9 +185,7 @@
 
       select(e) {
         eventHub.$emit('select-city', e.currentTarget.dataset);
-        wepy.wx.navigateBack(1).then((res) => {
-          console.log(store.state);
-        });
+        wepy.wx.navigateBack(1);
       },
 
       indexSelect(e) {

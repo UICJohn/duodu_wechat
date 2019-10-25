@@ -1,0 +1,30 @@
+<style lang="less">
+
+</style>
+
+<template>
+  <text>message</text>
+</template>
+
+<script>
+  import wepy from '@wepy/core'
+
+  wepy.page({
+    data: {
+
+    },
+
+    methods: {
+
+    },
+    onLoad() {
+    }
+  });
+</script>
+<config>
+  {
+    navigationBarTitleText: '多度找室友',
+    usingComponents: {
+    }
+  }
+</config>
