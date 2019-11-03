@@ -9,7 +9,9 @@ const fetchTokenHeader = () =>{
         'content-type': 'application/json',
         'Accept':'*/*',
         'Authorization': res.data
-      })).catch(err => eventHub.$emit('wx-error', err))
+      })).catch( (err) => {
+        eventHub.$emit('auth-user', err);
+      })
   })
 }
 
@@ -184,6 +186,7 @@ const fetchPosts = (filters = {}) => {
         header: header,
         method: 'GET'
       }).then(res => {
+        console.log(res.data.posts);
         resolve(res.data.posts);
       }).catch(err => {
         reject(err);

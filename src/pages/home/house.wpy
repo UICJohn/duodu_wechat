@@ -330,6 +330,15 @@
             },
             property_type: {
               require: true
+            },
+            type: {
+              required: true
+            },
+            payment_type: {
+              required: true
+            },
+            images: {
+              required: true
             }
           },
           messages: {
@@ -360,6 +369,15 @@
             },
             property_type: {
               required: '请填写住宅类型'
+            },
+            type: {
+              required: "请选择出租类型"
+            },
+            payment_type: {
+              required: "请选择付款周期"
+            },
+            images: {
+              required: "请添加图片"
             }
           },
         }
@@ -383,15 +401,17 @@
           payment_type: this.paymentTypeIndex,
           available_from: this.availableFrom,
           location_attributes: this.location,
-          post_type: (this.leaseTypeIndex == 0 ? 'take_house' : 'share_house'),
+          type: (this.leaseTypeIndex == 0 ? 'take_house' : 'share_house'),
           has_air_conditioner: this.hasAirConditioner,
           has_furniture: this.hasFurniture,
           has_elevator: this.hasElevator,
           has_cook_top:this.hasCookTop,
           has_appliance: this.hasAppliance,
           has_network: this.hasNetwork,
-          property_type: this.propertyTypes[this.propertyTypeIndex].code,
           tenants_gender: this.tenants_gender
+        }
+        if (this.propertyTypes[this.propertyTypeIndex]) {
+          form.property_type = this.propertyTypes[this.propertyTypeIndex].code
         }
 
         if(this.leaseTypeIndex == 1 && this.tenants) {
@@ -402,7 +422,8 @@
 
         if (!validator.checkData({
            ...form,
-          location: (this.location ? this.location.address : null)
+          location: (this.location ? this.location.address : null),
+          images: this.images
         })) return
 
         let _this = this
@@ -418,6 +439,7 @@
           _this.showStatusBar();
           setTimeout(function(){
             wepy.wx.navigateBack(1);
+            eventHub.$emit("refresh");
           }, 2000);
         })
       },

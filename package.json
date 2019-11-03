@@ -4,7 +4,7 @@
   "description": "duodu",
   "main": "weapp/app.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development ./node_modules/.bin/wepy build --watch --log trace",
+    "dev": "cross-env NODE_ENV=development ./node_modules/.bin/wepy build --watch",
     "production": "cross-env NODE_ENV=production ./node_modules/.bin/wepy build --no-cache",
     "staging": "cross-env NODE_ENV=staging ./node_modules/.bin/wepy build --no-cache",
     "clean": "rm -rf weapp",

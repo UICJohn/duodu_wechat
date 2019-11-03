@@ -42,7 +42,7 @@
       <input disabled="1" placeholder="{{location.name || '搜索宇宙'}}" class="paddint-sm" :style="{paddingLeft: '4rpx', width: '195px'}" @tap="chooseLocation"/>
     </div>
     <div class="flex align-center margin-sm">
-      <div class="cu-btn block bg-gradual-blue sm radius" @tap="newPost">
+      <div class="cu-btn block bg-cyan sm radius" @tap="newPost">
         <span class="iconfont icon-send" :style="{fontSize: '16px', marginRight: '5rpx'}"/>
         <text :style="{fontSize: '14px'}">发布</text>
       </div>
@@ -74,12 +74,12 @@
         <div class="cu-list menu text-left">
           <div class="cu-item">
             <div class="flex justify-between align-center flex-sub" data-path="home/house" @tap="navigateTo">
-              <div class="flex-sub">发布房源</div>              
+              <div class="flex-sub">发布房源 (整租, 分租)</div>              
             </div>
           </div>
           <div class="cu-item">
             <div class="flex justify-between align-center flex-sub" data-path="home/housemate" @tap="navigateTo">
-              <div class="flex-sub">发帖找室友</div>
+              <div class="flex-sub">发帖找室友 (无房源)</div>
             </div>
           </div>
         </div>
@@ -140,7 +140,25 @@
     },
     methods: {
       chooseLocation(e) {
-        
+        wepy.wx.chooseLocation().then((res) => {
+          this.location = {
+            name: res.name,
+            address: res.address,
+            longitude: res.longitude,
+            latitude: res.latitude
+          }
+        }).catch((err) => {
+          wepy.wx.getSetting().then((res) => {
+            if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
+              this.modalInfo = {
+                title: '获取地理位置',
+                body: '获取地理位置将帮助我们为您找到更合适的房源或室友, 请前往权限中心设置',
+                confirmEvent: 'open-setting'
+              }
+              this.showModal = true;    
+            }
+          })
+        })
       },
       cancel(e){
         this.setFilter = false;
@@ -191,7 +209,6 @@
             }
           }
           fetchPosts(this.filters).then(posts => {
-            console.log(posts);
             this.posts = posts
           })
         });

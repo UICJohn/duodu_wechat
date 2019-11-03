@@ -56,7 +56,7 @@
     </div>
 
     <div class="cu-form-group">
-      <div class="title"> 入住人数 </div>
+      <div class="title"> 需要室友人数 </div>
       <input v-model="tenants" name="tenant" style="width: 50rpx" type="number"/>
       <div class="action">
         人
@@ -244,7 +244,7 @@
           has_pets: this.hasPets,
           min_rent: this.minRent,
           max_rent: this.maxRent,
-          post_type: 'house_mate',
+          type: 'house_mate',
           tenants: this.tenants,
           has_air_conditioner: this.hasAirConditioner,
           has_furniture: this.hasFurniture,
@@ -264,6 +264,7 @@
           _this.showStatusBar();
           setTimeout(function(){
             wepy.wx.navigateBack(1);
+            eventHub.$emit("refresh");
           }, 2000);
         })
       },

@@ -4,6 +4,68 @@
   @import "~assets/css/icon.wxss";
   @import "~assets/css/iconfont.wxss";
 
+  .column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tag {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-radius: 10px;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card item {
+    margin: 0rpx;
+    border-radius: 0rpx;
+  }
+
+  .cover-img {
+    position: relative;
+  }
+
+  .cover-img image {
+    width:100%;
+  }
+  .cover-img .cu-tag {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .card .cover-img .price-tag {
+    position: absolute;
+    bottom: 45px;
+    color: white;
+  }
+
+  .card .cover-img .cu-bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: transparent;
+  }
+
+  .cu-bar .title {
+    width: 90%;
+  }
+
+  .cu-bar .action {
+    width: 10%;
+  }
+
+  .location {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+  }
 </style>
 
 <wxs module="m" lang="babel">
@@ -31,84 +93,180 @@
     }
   };
 
+  var avatarPath = function avatar(url) {
+    if (url) {
+      return url;
+    } else {
+      return 'https://duodu-storage.oss-cn-zhangjiakou.aliyuncs.com/assets/avatar.png';
+    }
+  };
+
+  var genderClass = function gender(gen) {
+    if (gen =='male'){
+      return 'cuIcon-male text-blue'
+    } else if (gen == 'female') {
+      return 'cuIcon-female text-red'
+    } else {
+      return 'iconfont icon-unknown-sex text-gray' 
+    }
+  }
+
   module.exports = {
     tag: tag,
-    location: location
+    location: location,
+    avatarPath: avatarPath,
+    genderClass: genderClass
   };
 </wxs>
 
 <template>
-  <div class="cu-card case">
-    <div v-for="(post, index) in posts" class="cu-item shadow">
-      <div class="cu-tag bg-white text-grey">
-        {{ post.title }}
+  <div class="card margin-tb margin-lr">
+    <div class="cu-tag bg-cyan" style="border-top-right-radius: 10px; border-top-left-radius: 10px;">整租</div>
+    <div class="cover-img item">
+      <image src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg" mode="widthFix"/>
+      <div class="price-tag padding-lr-sm">
+        <span class="cu-tag bg-pink radius" style="position: relative;">
+          2019-12-21后可入住
+        </span>
+        <span class="cu-tag bg-green radius" style="position: relative;">
+          2000元/月
+        </span>
       </div>
-      <div class="cu-tag bg-{{post.type == 'house_mate' ? 'blue' : 'purple'}}" :style="{float: 'right'}">
-        {{ m.tag(post.type) }}
+      <div class="cu-bar bg-shadeBottom padding-lr-sm">
+        <div class="title text-cut">
+          2房好房出租，近地铁
+        </div>
+        <div class="action" style="margin-right: 0;">
+          <span class="cuIcon-share" style="font-size: 21px;" />
+        </div>
       </div>
-
-      <div class="cu-list menu-avatar">
-        <div class="cu-item">
-           <div class="cu-avatar round lg" style="background-image: url({{post.user.avatar}});"/>
-          <div class="content flex-sub">
-            <div class="text-grey">
-              {{post.user.username}}
-              <span class="{{post.user.gender == 'male' ? 'cuIcon-male text-blue' : 'cuIcon-female text-red'}}"/>
-            </div>
-            <div class="text-gray text-sm flex justify-between">
-              {{post.timestamp}}
-              <div class="text-sm">
-                <block  v-if="post.type == 'share_house' || post.type=='housemate' ">
-                  <span class="iconfont icon-friends margin-lr-xs text-blue"/>
-                  {{post.tenants}}
-                </block>
-                <block v-if="post.type != 'housemate' ">
-                  <span class="iconfont icon-livings margin-lr-xs text-blue"/>
-                  {{post.livings}}
-                  <span class="iconfont icon-bedrooms margin-lr-xs text-blue"/>
-                  {{post.bedrooms}}
-                  <span class="iconfont icon-toilets margin-lr-xs text-blue"/>
-                  {{post.toilets}}
-                </block>
-              </div>
-            </div>
+    </div>
+    <div class="flex item padding-lr padding-tb-sm bg-white">
+      <div class="cu-avatar round lg" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg);"></div>
+      <div class="content margin-left-sm flex-sub">
+        <div class="text-grey margin-top-xs">
+          树上的糯米鸡
+          <span class="text-blue cuIcon-male"></span>
+        </div>
+        <div class="text-gray text-sm flex justify-between align-center">
+          <div class="timestamp">
+            十天前
+          </div>
+          <div class="flex align-center text-gray">
+            <span class="iconfont icon-like margin-left" style="font-size: 20px;"/>
+            <text class="text-black">281</text>
+            <span class="cuIcon-attentionfill margin-left" style="margin-right: 3rpx; font-size: 20px;"/>
+            <text class="text-black">1.2K</text>
+            <span class="cuIcon-messagefill margin-left" style="margin-right: 3rpx; font-size: 17px;"/>
+            <text class="text-black">14</text>
           </div>
         </div>
       </div>
-      <div class="flex solid-bottom justify-between align-center">
-        <div class="text-cut padding-lr margin-tb">
-          <text>{{post.body}}</text>
-        </div>
-        <div v-if="post.rent" class="cu-tag bg-blue radius margin-tb margin-right" :style="{float: 'right'}">{{post.rent}}元/月</div>
-      </div>
-      <div v-if="post.images" class="grid flex-sub padding-lr col-4 grid-square">
-        <div class="bg-img">
-          <img src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg"/>
-        </div>
-        <div class="bg-img">
-          <img src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg"/>
-        </div>
-        <div class="bg-img">
-          <img src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg"/>
-        </div>
-        <div class="bg-img">
-          <img src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg"/>
+    </div>
+    <div class="condition item grid col-4 bg-white padding-bottom-xs" style="border-bottom: 1rpx solid #eee;" >
+      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+        <span class="iconfont icon-livings text-cyan" style="font-size: 25px" />
+        <div class="text-gray">
+          2 厅室
         </div>
       </div>
-
-      <div class="padding-lr padding-tb-sm solid-top" >
-        <div class="flex">
-          <div class="text-sm text-blue flex-sub text-cut">
-            <span class="iconfont icon-location" style="{font-size: 14px;}"></span>
-            {{ m.location(post) }}
+      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+        <span class="iconfont icon-bedrooms text-cyan" style="font-size: 25px" />
+        <div class="text-gray">
+          2 卧室
+        </div>
+      </div>
+      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+        <span class="iconfont icon-toilets text-cyan" style="font-size: 25px" />
+        <div class="text-gray">
+          2 厕所
+        </div>
+      </div>
+      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+        <span class="iconfont icon-friends text-cyan" style="font-size: 25px" />
+        <div class="text-gray">
+          2 室友
+        </div>
+      </div>
+    </div>
+    <div class="location item bg-white padding-tb-xs padding-lr">
+      <div class="flex text-gray align-center">
+        <span class="cuIcon-location" style="font-size: 15px;" />
+        <div class="margin-lr-xs text-sm">永乐路226号</div>
+        -
+        <div class="margin-lr-xs text-sm">西安市</div>
+      </div>
+    </div>
+  </div>
+  <div class="card margin-tb margin-lr">
+    <div class="cu-tag bg-purple" style="border-top-right-radius: 10px; border-top-left-radius: 10px;">找室友</div>
+    <div class="flex item padding-lr padding-tb-sm bg-white">
+      <div class="cu-avatar round lg" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg);"></div>
+      <div class="content margin-left-sm flex-sub">
+        <div class="text-grey margin-top-xs">
+          树上的糯米鸡
+          <span class="text-blue cuIcon-male"></span>
+        </div>
+        <div class="text-gray text-sm flex justify-between align-center">
+          <div class="timestamp">
+            十天前
           </div>
-          <div class="action flex text-sm text-gray align-center">
-            <span class="cuIcon-like margin-left text-red" :style="{fontSize:'18px'}"/>
-            喜欢
-            <span class="cuIcon-attentionforbid margin-left" :style="{fontSize:'18px'}"/>
-            不感兴趣
+          <div class="flex align-center text-gray">
+            <span class="iconfont icon-like margin-left" style="font-size: 20px;"/>
+            <text class="text-black">281</text>
+            <span class="cuIcon-attentionfill margin-left" style="margin-right: 3rpx; font-size: 20px;"/>
+            <text class="text-black">1.2K</text>
+            <span class="cuIcon-messagefill margin-left" style="margin-right: 3rpx; font-size: 17px;"/>
+            <text class="text-black">14</text>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="item bg-white">
+      <div class="title padding-lr flex align-center">
+        <div class="text-cut padding-right-sm" style="width: 60%">
+          好房出租！
+        </div>
+        <div class='cu-tag bg-green' style="width: 40%">
+          预算1500 - 2000每月
+        </div>
+      </div>
+      <div class="body padding-lr padding-tb-sm text-gray text-sm">
+        好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租
+      </div>
+    </div>
+    <div class="condition item grid col-4 bg-white padding-bottom-xs" style="border-bottom: 1rpx solid #eee;" >
+      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+        <span class="iconfont icon-livings text-cyan" style="font-size: 25px" />
+        <div class="text-gray">
+          2 厅室
+        </div>
+      </div>
+      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+        <span class="iconfont icon-bedrooms text-cyan" style="font-size: 25px" />
+        <div class="text-gray">
+          2 卧室
+        </div>
+      </div>
+      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+        <span class="iconfont icon-toilets text-cyan" style="font-size: 25px" />
+        <div class="text-gray">
+          2 厕所
+        </div>
+      </div>
+      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+        <span class="iconfont icon-friends text-cyan" style="font-size: 25px" />
+        <div class="text-gray">
+          2 室友
+        </div>
+      </div>
+    </div>
+    <div class="location item bg-white padding-tb-xs padding-lr">
+      <div class="flex text-gray align-center">
+        <span class="cuIcon-location" style="font-size: 15px;" />
+        <div class="margin-lr-xs text-sm">新城区</div>
+        -
+        <div class="margin-lr-xs text-sm">西安市</div>
       </div>
     </div>
   </div>
