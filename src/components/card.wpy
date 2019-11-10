@@ -33,7 +33,9 @@
 
   .cover-img image {
     width:100%;
+    max-height: 220px;
   }
+
   .cover-img .cu-tag {
     position: absolute;
     right: 0;
@@ -69,92 +71,82 @@
 </style>
 
 <wxs module="m" lang="babel">
-  var tag = function tagStr(postType) {
-    if (postType == 'take_house') {
+  const tagColor = (post_type) => {
+    if (post_type == 'house_mate') {
+      return 'yellow';
+    } else {
+      return post_type == 'share_mate' ? 'cyan' : 'blue';
+    }
+  }
+
+  const tag = (post_type) => {
+    if (post_type == 'take_house') {
       return "整租"
-    } else if ( postType == 'share_house') {
+    } else if ( post_type == 'share_house') {
       return "分租"
     } else {
       return "找室友"
-    }
-  };
-
-  var location = function locations(post) {
-    if(post.type == "house_mate") {
-      let cityArr = []
-      post.locations.forEach(function(location, index){
-        cityArr.push(location.suburb_name + ", " + location.city_name)
-      })
-      cityArr = cityArr.filter((v, i, a) => a.indexOf(v) === i);
-      return cityArr.join(" | ");
-    }
-    else {
-      return post.location.name
-    }
-  };
-
-  var avatarPath = function avatar(url) {
-    if (url) {
-      return url;
-    } else {
-      return 'https://duodu-storage.oss-cn-zhangjiakou.aliyuncs.com/assets/avatar.png';
-    }
-  };
-
-  var genderClass = function gender(gen) {
-    if (gen =='male'){
-      return 'cuIcon-male text-blue'
-    } else if (gen == 'female') {
-      return 'cuIcon-female text-red'
-    } else {
-      return 'iconfont icon-unknown-sex text-gray' 
     }
   }
 
   module.exports = {
     tag: tag,
-    location: location,
-    avatarPath: avatarPath,
-    genderClass: genderClass
-  };
+    tagColor: tagColor
+  }
 </wxs>
 
 <template>
   <div class="card margin-tb margin-lr">
-    <div class="cu-tag bg-cyan" style="border-top-right-radius: 10px; border-top-left-radius: 10px;">整租</div>
-    <div class="cover-img item">
-      <image src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg" mode="widthFix"/>
-      <div class="price-tag padding-lr-sm">
-        <span class="cu-tag bg-pink radius" style="position: relative;">
-          2019-12-21后可入住
-        </span>
-        <span class="cu-tag bg-green radius" style="position: relative;">
-          2000元/月
-        </span>
+    <div class="cu-tag bg-{{m.tagColor(post.type)}}" style="border-top-right-radius: 10px; border-top-left-radius: 10px;">
+      {{m.tag(post.type)}}
+    </div>
+    <div class="cover-img item" v-if="post.type != 'house_mate'">
+      <image :src="post.image" mode="aspectFill"/>
+      <div class="price-tag padding-lr-sm" v-if="post.available_from">
+        <div class="title text-cut">
+          {{post.title}}
+        </div>
       </div>
       <div class="cu-bar bg-shadeBottom padding-lr-sm">
-        <div class="title text-cut">
-          2房好房出租，近地铁
+        <div>
+          <span class="cu-tag bg-pink radius" style="position: relative;">
+            {{post.available_from + '后可入住'}}
+          </span>
+          <span class="cu-tag bg-green radius" style="position: relative;">
+            {{post.rent + '元/月'}}
+          </span>
         </div>
         <div class="action" style="margin-right: 0;">
           <span class="cuIcon-share" style="font-size: 21px;" />
         </div>
       </div>
     </div>
+
     <div class="flex item padding-lr padding-tb-sm bg-white">
       <div class="cu-avatar round lg" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg);"></div>
       <div class="content margin-left-sm flex-sub">
-        <div class="text-grey margin-top-xs">
-          树上的糯米鸡
+        <div class="text-grey margin-top-xs" v-if="post.type != 'house_mate'">
+          {{post.user.username}}
           <span class="text-blue cuIcon-male"></span>
         </div>
+
+        <div class="flex text-grey margin-top-xs align-center" v-else>
+          <div class="flex-sub">
+            {{post.user.username}}
+            <span class="text-blue cuIcon-male"></span>
+          </div>
+          <div class="flex-sub text-right">
+            <span class="cuIcon-share" style="font-size: 21px;" />
+          </div>
+        </div>
+
         <div class="text-gray text-sm flex justify-between align-center">
           <div class="timestamp">
-            十天前
+            {{post.timestamp}}
           </div>
           <div class="flex align-center text-gray">
-            <span class="iconfont icon-like margin-left" style="font-size: 20px;"/>
-            <text class="text-black">281</text>
+            <span class="iconfont {{like ? 'icon-like-fill text-red' : 'icon-like'}} margin-left" :data-post="post.id" style="font-size: 20px;" @tap="clickLike"/>
+            <text class="text-black" style="margin-left: 2rpx">281</text>
             <span class="cuIcon-attentionfill margin-left" style="margin-right: 3rpx; font-size: 20px;"/>
             <text class="text-black">1.2K</text>
             <span class="cuIcon-messagefill margin-left" style="margin-right: 3rpx; font-size: 17px;"/>
@@ -163,136 +155,121 @@
         </div>
       </div>
     </div>
-    <div class="condition item grid col-4 bg-white padding-bottom-xs" style="border-bottom: 1rpx solid #eee;" >
-      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
-        <span class="iconfont icon-livings text-cyan" style="font-size: 25px" />
-        <div class="text-gray">
-          2 厅室
-        </div>
-      </div>
-      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
-        <span class="iconfont icon-bedrooms text-cyan" style="font-size: 25px" />
-        <div class="text-gray">
-          2 卧室
-        </div>
-      </div>
-      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
-        <span class="iconfont icon-toilets text-cyan" style="font-size: 25px" />
-        <div class="text-gray">
-          2 厕所
-        </div>
-      </div>
-      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
-        <span class="iconfont icon-friends text-cyan" style="font-size: 25px" />
-        <div class="text-gray">
-          2 室友
-        </div>
-      </div>
-    </div>
-    <div class="location item bg-white padding-tb-xs padding-lr">
-      <div class="flex text-gray align-center">
-        <span class="cuIcon-location" style="font-size: 15px;" />
-        <div class="margin-lr-xs text-sm">永乐路226号</div>
-        -
-        <div class="margin-lr-xs text-sm">西安市</div>
-      </div>
-    </div>
-  </div>
-  <div class="card margin-tb margin-lr">
-    <div class="cu-tag bg-purple" style="border-top-right-radius: 10px; border-top-left-radius: 10px;">找室友</div>
-    <div class="flex item padding-lr padding-tb-sm bg-white">
-      <div class="cu-avatar round lg" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg);"></div>
-      <div class="content margin-left-sm flex-sub">
-        <div class="text-grey margin-top-xs">
-          树上的糯米鸡
-          <span class="text-blue cuIcon-male"></span>
-        </div>
-        <div class="text-gray text-sm flex justify-between align-center">
-          <div class="timestamp">
-            十天前
-          </div>
-          <div class="flex align-center text-gray">
-            <span class="iconfont icon-like margin-left" style="font-size: 20px;"/>
-            <text class="text-black">281</text>
-            <span class="cuIcon-attentionfill margin-left" style="margin-right: 3rpx; font-size: 20px;"/>
-            <text class="text-black">1.2K</text>
-            <span class="cuIcon-messagefill margin-left" style="margin-right: 3rpx; font-size: 17px;"/>
-            <text class="text-black">14</text>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="item bg-white">
+    <div class="item bg-white" v-if="post.type == 'house_mate'">
       <div class="title padding-lr flex align-center">
         <div class="text-cut padding-right-sm" style="width: 60%">
-          好房出租！
+          {{post.title}}
         </div>
-        <div class='cu-tag bg-green' style="width: 40%">
-          预算1500 - 2000每月
+        <div class="cu-tag bg-green" style="width: 40%">
+          {{'预算' + post.min_rent + '-' + post.max_rent + '每月'}}
         </div>
       </div>
       <div class="body padding-lr padding-tb-sm text-gray text-sm">
-        好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租，要求不抽烟不喝酒不烫头好房出租
+        {{post.body}}
       </div>
     </div>
-    <div class="condition item grid col-4 bg-white padding-bottom-xs" style="border-bottom: 1rpx solid #eee;" >
-      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
-        <span class="iconfont icon-livings text-cyan" style="font-size: 25px" />
-        <div class="text-gray">
-          2 厅室
+
+    <block v-if="post.type !='house_mate'" >
+      <div class="condition item grid col-{{post.tenants ? '4' : '3'}} bg-white padding-bottom-xs" style="border-bottom: 1rpx solid #eee;">
+        <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+          <span class="iconfont icon-livings text-cyan" style="font-size: 25px" />
+          <div class="text-gray">
+            {{post.livings + ' 厅室'}}
+          </div>
+        </div>
+        <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+          <span class="iconfont icon-bedrooms text-cyan" style="font-size: 25px" />
+          <div class="text-gray">
+            {{post.rooms + ' 卧室'}}
+          </div>
+        </div>
+        <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+          <span class="iconfont icon-toilets text-cyan" style="font-size: 25px" />
+          <div class="text-gray">
+            {{post.toilets + ' 厕所'}}
+          </div>
+        </div>
+        <div class="column text-center padding-top-xs" style="margin-bottom: 0px;" v-if="post.tenants">
+          <span class="iconfont icon-friends text-cyan" style="font-size: 25px" />
+          <div class="text-gray">
+            {{post.tenants + ' 室友'}}
+          </div>
         </div>
       </div>
-      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
-        <span class="iconfont icon-bedrooms text-cyan" style="font-size: 25px" />
-        <div class="text-gray">
-          2 卧室
+      <div class="location item bg-white padding-tb-xs padding-lr flex justify-between align-center">
+        <div class="text-grey">
+          <span class="cuIcon-location" style="font-size: 15px;" />
+          <span class="text-sm text-cut">{{ post.location.name }}</span>
+        </div>
+        <div class="flex text-gray align-center">
+          <div class="margin-lr-xs text-sm">{{ post.location.suburb }}</div>
+          -
+          <div class="margin-lr-xs text-sm">{{ post.location.city }}</div>
         </div>
       </div>
-      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
-        <span class="iconfont icon-toilets text-cyan" style="font-size: 25px" />
-        <div class="text-gray">
-          2 厕所
+    </block>
+    <block v-else>
+      <div class="condition item grid col-3 bg-white padding-bottom-xs" style="border-bottom: 1rpx solid #eee;">
+        <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+          <span class="iconfont icon-cigarette text-{{post.smoker ? 'cyan' : 'gray' }}" style="font-size: 25px" />
+          <div class="text-gray">
+            抽烟
+          </div>
+        </div>
+        <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+          <span class="{{post.tenant_gender == 'male' ? 'cuIcon-male text-cyan' : post.tenant_gender == 'female text-cyan' ? 'cuIcon-female' : 'iconfont icon-unknown-sex text-gray'}}" style="font-size: 25px" />
+          <div class="text-gray">
+            性别限制
+          </div>
+        </div>
+        <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
+          <span class="iconfont icon-pet text-{{post.has_pets ? 'cyan' : 'gray'}}" style="font-size: 25px" />
+          <div class="text-gray">
+            宠物
+          </div>
         </div>
       </div>
-      <div class="column text-center padding-top-xs" style="margin-bottom: 0px;">
-        <span class="iconfont icon-friends text-cyan" style="font-size: 25px" />
-        <div class="text-gray">
-          2 室友
+      <div class="location item bg-white padding-tb-xs padding-lr">
+        <div class="flex text-grey align-center">
+          <span class="cuIcon-location" style="font-size: 15px;" />
+          <div class="margin-lr-xs text-sm">{{post.locations[0].suburb}}</div>
+          -
+          <div class="margin-lr-xs text-sm">{{post.locations[0].city}}</div>
         </div>
       </div>
-    </div>
-    <div class="location item bg-white padding-tb-xs padding-lr">
-      <div class="flex text-gray align-center">
-        <span class="cuIcon-location" style="font-size: 15px;" />
-        <div class="margin-lr-xs text-sm">新城区</div>
-        -
-        <div class="margin-lr-xs text-sm">西安市</div>
-      </div>
-    </div>
+    </block>
   </div>
 </template>
 
 <script>
   import wepy from "@wepy/core"
   import eventHub from '../common/eventHub';
+  import { likePost } from '../common/api';
+
   wepy.component({
     props: {
-      posts: Object,
-      clickImageEvent: String,
+      post: Object,
       key: String,
+      like: false
     },
     methods: {
-      clickImage(e){
-        eventHub.$emit(this.clickImageEvent, e.currentTarget);
+
+      // clickImage(e){
+      //   eventHub.$emit(this.clickImageEvent, e.currentTarget);
+      // },
+
+      clickLike(e) {
+        let id = e.currentTarget.dataset.post
+        if (this.like){
+          likePost(id, false).then( res => {
+            this.like = !this.like
+          })
+        } else {
+          likePost(id, true).then( res => {
+            this.like = !this.like
+          })
+        }        
       }
     }
   })
 </script>
-
-<config>
-  {
-    usingComponents: {
-
-    }
-  }
-</config>

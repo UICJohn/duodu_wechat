@@ -213,6 +213,24 @@ const fetchSubways = (city) => {
   })
 }
 
+const likePost = (post_id, like = true) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      let url = like ? "/v1/posts/"+post_id+"/like" :  "/v1/posts/"+post_id+"/dislike"
+      let method = like ? "POST" : "DELETE"
+      request({
+        url: BASE_URL + url,
+        header: header,
+        method: method
+      }).then(res => {
+        resolve(res.data.subways);
+      }).catch(err => {
+        reject(err);
+      })
+    })
+  }) 
+}
+
 module.exports = {
   authenticate: authenticate,
   createPost: createPost,
@@ -225,5 +243,6 @@ module.exports = {
   uploadPostImage: uploadPostImage,
   fetchPosts: fetchPosts,
   fetchSuburbs: fetchSuburbs,
-  fetchSubways: fetchSubways
+  fetchSubways: fetchSubways,
+  likePost: likePost
 }

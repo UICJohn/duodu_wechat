@@ -55,7 +55,9 @@
   </button>
 
   <scroll-view class="content">
-    <card :posts="posts" clickImageEvent="show-post"/>
+    <block v-for="post in posts" v-key="post.id">
+      <card :post="post" :like="post.like"/>
+    </block>
   </scroll-view>
 
   <modal :show.sync="showModal" :title="modalInfo.title" :body="modalInfo.body" :confirmEvent="modalInfo.confirmEvent" />
@@ -198,9 +200,9 @@
         eventHub.$on('select-city', (res)=> {
           this.location = res;
         });
-        eventHub.$on('show-post', (res) => {
-          this.$navigate('postDetail', [res.id]);
-        });
+        // eventHub.$on('show-post', (res) => {
+        //   this.$navigate('postDetail', [res.id]);
+        // });
         eventHub.$on('refresh', (res) => {
           if(res && res.filters){
             this.filters = {
