@@ -1,7 +1,7 @@
 import eventHub from './eventHub';
 import wepy from '@wepy/core';
 
-export const numberValidator = (min, max) =>{
+const numberValidator = (min, max) =>{
   return (v) => {
     let valid = true, num = Number(v);
     if (isNaN(num)) {
@@ -17,7 +17,7 @@ export const numberValidator = (min, max) =>{
   };
 };
 
-export const stringToBoolean = () =>{
+const stringToBoolean = () =>{
   return (v) => {
     if (typeof v === 'string' && (v === '0' || v === 'false'))
       return false;
@@ -57,12 +57,7 @@ const userMapping = (userInfo) => {
     let user_info = {
       username: userInfo.nickName,
       gender: userInfo.gender,
-      avatar_url: userInfo.avatarUrl,
-      // location_attributes: {
-      //   city: userInfo.city,
-      //   province: userInfo.province,
-      //   country: userInfo.country,
-      // }
+      avatar_url: userInfo.avatarUrl
     }
     return user_info
   }
