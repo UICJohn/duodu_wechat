@@ -30,6 +30,17 @@ const request = (options) => {
     wepy.wx.request({ ...options }).then((res) => {
       errorHanlder(res).then((res) => {
         resolve(res)
+      }).catch(err => {
+        // retry if authentication failed
+        setTimeout(function() {
+          wepy.wx.request({ ...options }).then((res) => {
+            errorHanlder(res).then(res => {
+              resolve(res);
+            }).catch(err => {
+              reject(err);
+            })
+          })
+        }, 2000)
       })
     }).catch((err) => {
       eventHub.$emit('wx-error', err);

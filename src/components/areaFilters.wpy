@@ -186,9 +186,6 @@
         eventHub.$on('select-city', (res)=> {
           this.syncFilters(res.city);
         });
-        eventHub.$on('authencated', () => {
-          this.syncFilters(this.region)
-        });
       },
     },
     attached(){

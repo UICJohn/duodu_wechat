@@ -187,9 +187,6 @@
         })
       },
       regEvents(){
-        eventHub.$on('authencated', () => {
-          eventHub.$emit('refresh');
-        }),
         eventHub.$on('modal-confirm', ()=>{
           this.showModal = false;
           eventHub.$emit("open-setting");
