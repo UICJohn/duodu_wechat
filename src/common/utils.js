@@ -40,7 +40,7 @@ const request = (options) => {
               reject(err);
             })
           })
-        }, 2000)
+        }, 5000)
       })
     }).catch((err) => {
       eventHub.$emit('wx-error', err);

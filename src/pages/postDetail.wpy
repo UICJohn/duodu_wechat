@@ -63,26 +63,31 @@
 
   .images {
     .image-large {
-      width: 170px;
+      width: 190px;
       height: 230px;
       box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
       overflow: hidden;
       border-radius: 10px;
       image {
-        width: 180px;
+        width: 190px;
       }
     }
     .image-medium {
-      width: 170px;
+      width: 190px;
       height: 100px;
       box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
       overflow: hidden;
       border-radius: 10px;
       image {
-        width: 180px;
-        height: 100px;
+        width: 190px;
+        height: 120px;
       }
     }
+  }
+  .bar {
+    display: flex;
+    justify-content: felx-end;
+    align-items: center;
   }
 </style>
 
@@ -129,7 +134,7 @@
           {{post.title}}
           <span class="text-xs text-gray"> {{post.timestamp}} </span>
         </div>
-        <span class="text-black text-xs margin-top-xs">
+        <span class="text-grey text-xs margin-top-xs">
           {{"￥" + post.rent + " /月"}}
         </span>
       </div>
@@ -162,14 +167,21 @@
     </div>
   </div>
 
-  <div class="images padding-lr margin flex">
+  <div class="bar padding margin-top margin-lr bg-white radius-top">
+    <div class="flex-sub text-grey">房源图片</div>
+    <div class="action flex">
+      <span class="cu-btn bg-cyan radius">所有图片</span>
+    </div>
+  </div>
+
+  <div class="images padding margin-lr margin-bottom flex bg-white radius-bottom">
     <div class="image-large">
       <image :src="post.cover_image" mode="aspectFill"></image>
     </div>
 
     <div class="image-medium margin-left-sm">
       <image :src="post.images[0].url"></image>
-      <image :src="post.images[1].url"></image>
+      <image :src="post.images[0].url"></image>
     </div>
   </div>
 

@@ -90,7 +90,17 @@ image {
 }
 
 .radius {
-	border-radius: 10px;
+	border-radius: 10rpx;
+}
+
+.radius-top {
+	border-top-right-radius: 10rpx;	
+	border-top-left-radius: 10rpx;
+}
+
+.radius-bottom {
+	border-bottom-right-radius: 10rpx;	
+	border-bottom-left-radius: 10rpx;
 }
 
 /* ==================
