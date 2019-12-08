@@ -60,10 +60,9 @@
 
     methods: {
       regAppEvents(){
-        eventHub.$on('auth-user', () => {          
+        eventHub.$on('auth-user', () => {
           authenticate().then((res) => {
             wepy.wx.setStorageSync('accessToken', res.header["Authorization"])
-            eventHub.$emit('authencated');
           });
         });
 
@@ -98,6 +97,7 @@
 <config>
 {
   pages: [
+    'pages/postDetail',
     'pages/home',
     'pages/account',
     'pages/nearby',
@@ -106,7 +106,7 @@
   subPackages:[
     {
       root: 'pages/home/',
-      pages: ['cities', 'postDetail', 'house', 'housemate']
+      pages: ['cities', 'house', 'housemate']
     },
     {
       root: 'pages/account/',

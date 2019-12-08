@@ -56,7 +56,7 @@ const errorHanlder = (res) => {
       reject(res);
     } else if([400, 404, 422, 500].includes(res.statusCode)){
       eventHub.$emit('bad-request', res);
-      reject(res);
+      // reject(res);
     } else {
       resolve(res);
     }

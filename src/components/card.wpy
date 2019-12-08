@@ -101,7 +101,7 @@
       {{m.tag(post.type)}}
     </div>
     <div class="cover-img item" v-if="post.type != 'house_mate'">
-      <image :src="post.image" mode="aspectFill"/>
+      <image :data-post="post.id" :src="post.image" mode="aspectFill" @tap="imageTapped" />
       <div class="price-tag padding-lr-sm" v-if="post.available_from">
         <div class="title text-cut">
           {{post.title}}
@@ -250,25 +250,20 @@
     props: {
       post: Object,
       key: String,
-      like: false
+      like: false,
+      clickEvent: String
     },
     methods: {
 
-      // clickImage(e){
-      //   eventHub.$emit(this.clickImageEvent, e.currentTarget);
-      // },
-
       clickLike(e) {
         let id = e.currentTarget.dataset.post
-        if (this.like){
-          likePost(id, false).then( res => {
-            this.like = !this.like
-          })
-        } else {
-          likePost(id, true).then( res => {
-            this.like = !this.like
-          })
-        }        
+        likePost(id, !this.like).then( res => {
+          this.like = !this.like
+        })
+      },
+
+      imageTapped(e) {
+        eventHub.$emit(this.clickEvent, e.currentTarget.dataset.post)
       }
     }
   })

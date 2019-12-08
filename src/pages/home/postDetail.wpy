@@ -2,9 +2,20 @@
   page{
     background-color: #eee;
   }
+
+  .big-screen {
+    width: 100%;
+  }
 </style>
 
 <template>
+  <div class="big-screen margin">
+    <image :src="imageShow" mode="aspectFill"></image>
+  </div>
+  <div class="thumbs">
+    <block v-for="(image, index) in post.images" :key="index">
+    </block>
+  </div>
 
 </template>
 
@@ -12,20 +23,25 @@
   import wepy from '@wepy/core';
   import eventHub from '../../common/eventHub';
   import { mapState } from '@wepy/x';
-  
+  import { fetchPost } from '../../common/api';
 
   wepy.page({
 
     data: {
-      post: null
+      post: null,
+      imageShow: null
     },
 
     methods: {
 
     },
 
-    onLoad(params) {
-      
+    onLoad(params, data) {
+      // fetchPost(params[0]).then(post => {
+      fetchPost(2).then(post => {
+        this.post = post
+      });
+      this.imageShow = this.post.images[0].url
     }
   });
 </script>

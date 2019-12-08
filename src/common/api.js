@@ -186,7 +186,6 @@ const fetchPosts = (filters = {}) => {
         header: header,
         method: 'GET'
       }).then(res => {
-        console.log(res.data.posts);
         resolve(res.data.posts);
       }).catch(err => {
         reject(err);
@@ -195,6 +194,21 @@ const fetchPosts = (filters = {}) => {
   })
 }
 
+
+const fetchPost = (id) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header)=>{
+      request({
+        url: BASE_URL + '/v1/posts/' + id,
+        header: header,
+        method: 'GET'
+      }).then(res => {
+        console.log(res);
+        resolve(res.data.post);
+      })
+    })
+  })
+}
 
 const fetchSubways = (city) => {
   return new Promise((resolve, reject) => {
@@ -242,6 +256,7 @@ module.exports = {
   updatePhone: updatePhone,
   uploadPostImage: uploadPostImage,
   fetchPosts: fetchPosts,
+  fetchPost: fetchPost,
   fetchSuburbs: fetchSuburbs,
   fetchSubways: fetchSubways,
   likePost: likePost
