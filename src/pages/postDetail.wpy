@@ -3,19 +3,23 @@
     background-color: #eee;
   }
 
-  .avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 2px solid #D0A475;
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
+  .label {
+    padding: 1px;
+    border: 1px solid grey;
   }
 
-  .avatar image{
-    width: 70px;
-    height: 70px;
-    bottom: 10px;
+  .top-screen {
+    width: 100%;
+    height: 180px;
+    padding-top: 80px;
+  }
+
+  .action {
+    margin-left: 3px;
+    margin-right: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .user-action {
@@ -28,12 +32,12 @@
 
   .main-conditions{
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
   }
 
   .main-condition {
-    width: 85px;
-    height: 95px;
+    width: 80px;
+    height: 90px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -88,6 +92,31 @@
     justify-content: felx-end;
     align-items: center;
   }
+
+  .post-comment {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    textarea {
+      width: 81%;
+      border-radius: 10px;
+      border: 1px solid #eee;
+      margin-left: 25px;
+      padding: 10px;
+      color: grey;
+      height: 100px;
+      &::before {
+        content: "";
+        width: 0px;
+        height: 0px;
+        border: 0.8em solid transparent;
+        position: absolute;
+        left: -22px;
+        top: 6%;
+        border-right: 10px solid #eee;
+      }
+    }
+  }
 </style>
 
 <wxs module="m" lang="babel">
@@ -101,78 +130,90 @@
 </wxs>
 
 <template>
-  <div class="flex padding-lr padding-tb-sm bg-white margin radius">
-    <div class="avatar">
-      <image :src="post.user.avatar" mode="aspectFill"></image>
-    </div>
-    <div class="content margin-left-sm flex-sub">
-      <div class="flex text-grey align-center">
-        <div class="flex-sub padding-top-xs">
-          <div class="username">
-            {{post.user.username}}
-          </div>
-          <div class="userinfo text-sm text-gray">
-            <div class="age" v-if="post.user.age"> 年龄: {{post.user.age}} </div>
-            <div class="margin-left-sm" v-if="post.user.gender"> 
-              性别:
-              <span class="{{ post.user.gender == 'male' ? 'cuIcon-male text-cyan' : 'cuIcon-female text-pink' }}"></span>
+  <div class="top-screen" style="background-size: cover; background: url('{{post.cover_image}}') no-repeat center center;">
+    <div class="shadow flex padding-lr padding-tb-sm bg-white margin-lr radius">
+      <div class="avatar">
+        <image :src="post.user.avatar" mode="aspectFill"></image>
+      </div>
+      <div class="content margin-left-sm flex-sub">
+        <div class="flex text-grey">
+          <div class="flex-sub padding-top-xs">
+            <div class="username">
+              {{post.user.username}}
+            </div>
+            <div class="userinfo text-sm text-gray">
+              <div class="age" v-if="post.user.age"> 年龄: {{post.user.age}} </div>
+              <div class="margin-left-sm" v-if="post.user.gender"> 
+                性别:
+                <span class="{{ post.user.gender == 'male' ? 'cuIcon-male text-cyan' : 'cuIcon-female text-pink' }}"></span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="flex-sub margin-top user-action text-right text-black">
-          <span class="cuIcon-message margin-right text-lg"></span>
-          <span class="cuIcon-phone text-lg"></span>
+          <div class="flex-sub margin-top user-action text-right text-black">
+            <span class="cuIcon-message margin-right text-lg"></span>
+            <span class="cuIcon-phone text-lg"></span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="padding-lr padding-tb-sm bg-white margin radius">    
+  <div class="shadow padding-lr padding-tb-sm bg-white">    
     <div class="top flex">
       <div class="flex-sub">
-        <div class="text-black">
+        <span class="text-xs text-gray"> {{post.timestamp}} </span>
+        <div class="text-black margin-top-sm">
           {{post.title}}
-          <span class="text-xs text-gray"> {{post.timestamp}} </span>
+          <span class="label text-grey text-xs margin-top-xs">
+            {{"￥" + post.rent + " /月"}}
+          </span>
         </div>
-        <span class="text-grey text-xs margin-top-xs">
-          {{"￥" + post.rent + " /月"}}
-        </span>
       </div>
-      <div class="flex-sub flex align-center" style="justify-content: flex-end;">
-        <span class="iconfont {{like ? 'icon-like-fill text-red' : 'icon-like'}} margin-right-xs" :data-post="post.id" style="font-size: 20px;" @tap="clickLike"/>
-        <span>{{like_count}}</span>
+      <div class="flex-sub flex align-top" style="justify-content: flex-end;">
+        <div class="action">
+          <span class="{{like ? 'cuIcon-likefill text-red' : 'cuIcon-like'}} margin-right-xs" :data-post="post.id" style="font-size: 19px;" @tap="clickLike"/>
+          <span class="text-xs">{{like_count}}</span>
+        </div>
+        <div class="action">
+          <span class="cuIcon-messagefill margin-right-xs" :data-post="post.id" style="font-size: 19px;" @tap="clickLike"/>
+          <span class="text-xs">201</span>
+        </div>
+        <div class="action">
+          <span class="cuIcon-attentionfill margin-right-xs" :data-post="post.id" style="font-size: 19px;" @tap="clickLike"/>
+          <span class="text-xs">1200</span>
+        </div>
       </div>
     </div>
     <div class="body padding-top-lg text-sm">
       {{ post.body }}
     </div>
 
-    <div class="main-conditions margin-top-lg">
-      <div class="main-condition padding-top flex bg-gradual-blue text-white radius">
+    <div class="main-conditions margin-tb">
+      <div class="main-condition padding-top flex text-grey radius shadow">
         <span class="iconfont icon-friends"></span>
-        <text class="margin-top-sm" style="font-size: 20px;">{{post.tenants}}</text>
+        <text class="margin-top-sm" style="font-size: 18px;">{{post.tenants}}</text>
       </div>
-      <div class="main-condition padding-top flex bg-gradual-blue text-white radius">
+      <div class="main-condition padding-top flex text-grey radius shadow">
         <span class="iconfont icon-bedrooms"></span>
-        <text class="margin-top-sm" style="font-size: 20px;">{{post.rooms}}</text>
+        <text class="margin-top-sm" style="font-size: 18px;">{{post.rooms}}</text>
       </div>
-      <div class="main-condition padding-top flex bg-gradual-blue text-white radius">
+      <div class="main-condition padding-top flex text-grey radius shadow">
         <span class="iconfont icon-toilets"></span>
-        <text class="margin-top-sm" style="font-size: 20px;">{{post.toilets}}</text>
+        <text class="margin-top-sm" style="font-size: 18px;">{{post.toilets}}</text>
       </div>
-      <div class="main-condition padding-top flex bg-gradual-blue text-white radius">
+      <div class="main-condition padding-top flex text-grey radius shadow">
         <span class="iconfont icon-livings"></span>
-        <text class="margin-top-sm" style="font-size: 20px;">{{post.livings}}</text>
+        <text class="margin-top-sm" style="font-size: 18px;">{{post.livings}}</text>
       </div>
     </div>
   </div>
 
-  <div class="shadow margin-tb margin-lr bg-white radius">
-    <div class="bar padding-tb-sm padding-lr">
+  <div class="shadow bg-white padding-tb">
+    <div class="bar padding-bottom-sm padding-lr">
       <div class="flex-sub text-grey text-sm">所有图片</div>
     </div>
 
-    <div class="images margin-bottom flex">
+    <div class="images padding-bt">
       <div class="grid flex-sub padding-lr col-4 grid-square">
         <block v-for="(image, index) in post.images">
           <div class="col radius">
@@ -183,7 +224,7 @@
     </div>
   </div>
 
-  <div class="shadow margin-tb margin-lr bg-white radius">
+  <div class="shadow bg-white">
     <div class="bar padding-left padding-tb-sm">
       <div class="flex-sub text-grey text-sm">房屋情况</div>
     </div>
@@ -235,6 +276,26 @@
     </div>
   </div>
 
+  <div class="comments padding bg-white margin-top">
+    <div class="bar text-sm">
+      评论 (46)
+    </div>
+    <div class="post-comment margin-top align-top">
+      <div class="avatar-sm">
+        <image :src="post.user.avatar" mode="aspectFill"></image>
+      </div>
+      <textarea placeholder="发表一个评论吧!" placeholder-style="color:gray;" maxlength="80" class="comment" bindinput="commentChange"/>
+    </div>
+    <div class="row padding-lr-sm margin-top-sm" style="justify-content: flex-end;">
+      <span class="comment-count margin-right-sm text-sm {{comment_count > 80 ? 'text-red' : 'text-grey'}}">
+        {{"( " + comment_count +"/80 )"}}
+      </span>
+      <div class="cu-btn line-orange sm" style="position: relative;float: right;">
+        <span class="iconfont icon-fabu"></span>
+        发表评论
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -249,7 +310,8 @@
       post: null,
       imageShow: null,
       like: false,
-      like_count: 0
+      like_count: 0,
+      comment_count: 0
     },
 
     methods: {
@@ -260,6 +322,9 @@
           this.like_count = this.like ? (this.like_count + 1) : (this.like_count - 1)
         })
       },
+      commentChange(e){
+        this.comment_count = e.$wx.detail.value.length;
+      }
     },
 
     onLoad(params, data) {

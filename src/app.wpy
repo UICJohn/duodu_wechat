@@ -37,6 +37,38 @@
     box-shadow: 0 3px 4px grey;
   }
 
+  .avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .avatar image{
+    width: 70px;
+    height: 70px;
+    bottom: 10px;
+  }
+
+  .avatar-sm {
+    width: 40px;
+    height: 40px;
+  }
+
+  .avatar-sm image{
+    width: 45px;
+    height: 45px;
+    bottom: 4px;
+  }
+
+  .avatar, .avatar-sm {
+    border-radius: 50%;
+    border: 2px solid #D0A475;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+
+  .align-top {
+    align-items: start;
+  }
 </style>
 
 <script>
