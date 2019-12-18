@@ -143,6 +143,10 @@
       border-right: 10px solid #eee;
     }
   }
+
+  .sub_comments_block {
+    width: 100%;
+  }
 </style>
 
 <wxs module="m" lang="babel">
@@ -212,7 +216,7 @@
         </div>
         <div class="action">
           <span class="cuIcon-messagefill margin-right-xs" :data-post="post.id" style="font-size: 19px;"/>
-          <span class="text-xs">{{post.comments.length}}</span>
+          <span class="text-xs">{{comments.length}}</span>
         </div>
         <div class="action">
           <span class="cuIcon-attentionfill margin-right-xs" :data-post="post.id" style="font-size: 19px;"/>
@@ -315,7 +319,7 @@
   <div class="comments padding bg-white margin-top">
     <form bindsubmit="sendComment">
       <div class="bar text-sm">
-        {{"评论 (" + post.comments.length + ")"}}
+        {{"评论 (" + comments.length + ")"}}
       </div>
       <div class="post-comment margin-top align-top">
         <div class="avatar-sm">
@@ -339,26 +343,32 @@
       </div>
     </form>
 
-    <block v-for="(comment, index) in post.comments" v-key="index">
-      <div class="row padding-top-sm align-top divider">
-        <div class="avatar-xs">
-          <image :src="comment.user.avatar" mode="aspectFill"></image>
-        </div>
-        <div class="column padding-left-xs align-start" style="width: 90%;">
-          <div class="user-info">
-            <span class="text-yellow text-sm">{{ comment.user.username }}</span>
-          </div>
-          <div class="comment text-sm">
-            {{comment.body}}
-          </div>
-          <div class="row between margin-top-sm" style="width: 100%;">
-            <span class="btn-link text-grey text-sm">{{ comment.tracer }}</span>
-            <span class="btn-link text-grey text-sm" @tap="reply" data-target="comment" :data-id="comment.id" :data-username="comment.user.username">回复</span>
-          </div>
-          <div class="divider margin-top-sm" style="width: 100%;"></div>
-        </div>
+    <div class="row padding-top-sm align-top divider"  v-for="(comment, index) in comments" v-key="index">
+      <div class="avatar-xs">
+        <image :src="comment.user.avatar" mode="aspectFill"></image>
       </div>
-    </block>
+      <div class="column padding-lr-sm align-start" style="width: 90%;">
+        <div class="user-info">
+          <span class="text-yellow text-sm">{{ comment.user.username }}</span>
+        </div>
+        <div class="comment text-sm margin-top-xs">
+          {{comment.body}}
+        </div>
+
+        <div v-if="comment.sub_comments.length > 0" class="sub_comments_block bg-gray padding-sm margin-top-sm">
+          <div class="row align-center" v-for="(subComment, index) in comment.sub_comments" v-key="index">
+            <span class="text-sm text-blue">{{subComment.user.username + ": "}}</span>
+            <span class="margin-left-xs text-grey text-sm">{{subComment.body}}</span>
+          </div>
+        </div>
+
+        <div class="row between margin-top-sm" style="width: 100%;">
+          <span class="btn-link text-grey text-sm">{{ comment.tracer }}</span>
+          <span class="btn-link text-grey text-sm" @tap="reply" data-target="comment" :data-id="comment.id" :data-username="comment.user.username">回复</span>
+        </div>
+        <div class="divider margin-top-sm" style="width: 100%;"></div>
+      </div>
+    </div>
   </div>
 
   <div class="cu-modal bottom-modal" :class="{'show': showReplyModal}">
@@ -381,7 +391,7 @@
                <open-data  type="userAvatarUrl"></open-data>
             </block>
           </div>
-          <textarea placeholder="回复@{{replyTo}}" name="comment" placeholder-style="color:#ddd;font-size:14px;" class="comment-textarea" maxlength="80" :value="comment" bindinput="commentChange"/>
+          <textarea placeholder="回复@{{replyTo}}" name="comment" placeholder-style="color:#ddd;font-size:14px;" class="comment-textarea" maxlength="80" :value="replyMsg" bindinput="commentChange"/>
         </div>
       </form>
     </div>
@@ -403,8 +413,10 @@
       like_count: 0,
       commentCount: 0,
       comment: null,
+      replyMsg: null,
       replyTo: null,
-      showReplyModal: false
+      showReplyModal: false,
+      comments: null
     },
 
     methods: {
@@ -431,6 +443,8 @@
               title: '发送成功',
               icon: 'success'
             });
+            console.log(res);
+            this.comments = res.data.comments
           }).catch(err => {
             wx.showToast({
               title: '发表评论失败了~ 稍后再发吧!'
@@ -441,10 +455,11 @@
 
       submitReplyComment(e){
         let comment = e.$wx.detail.value.comment
-        console.log(comment);
         if (comment.length > 0 && comment.length < 80) {
           replyComment(this.replyCommentId, comment).then(res => {
             this.showReplyModal = false;
+            this.replyMsg = '';
+            this.comments = res.data.comments
             wx.showToast({
               title: '发送成功',
               icon: 'success'
@@ -471,6 +486,7 @@
         this.imageShow = this.post.images[0].url
         this.like = this.post.like
         this.like_count = this.post.like_count
+        this.comments = this.post.comments
       });
     }
   });
