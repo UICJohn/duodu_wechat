@@ -213,6 +213,7 @@
           }
           fetchPosts(this.filters).then(posts => {
             this.posts = posts
+            console.log(this.posts);
           })
         });
         eventHub.$on('close-filters', (refresh) => {

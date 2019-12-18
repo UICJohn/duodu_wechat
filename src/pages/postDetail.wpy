@@ -99,12 +99,10 @@
     flex-wrap: wrap;
     textarea {
       width: 81%;
-      border-radius: 10px;
-      border: 1px solid #eee;
       margin-left: 25px;
       padding: 10px;
       color: grey;
-      height: 100px;
+      height: 90px;
       &::before {
         content: "";
         width: 0px;
@@ -115,6 +113,34 @@
         top: 6%;
         border-right: 10px solid #eee;
       }
+    }
+  }
+
+  .record {
+    display: flex;
+    .user-info {
+      display: flex;
+    }
+  }
+
+  .comment-block .divider{
+    &:before {
+      margin-left: 34px;
+    }
+  }
+
+  .cu-modal .comment-textarea {
+    margin-left: 17px;
+    padding: 10px;
+    &::before {
+      content: "";
+      width: 0px;
+      height: 0px;
+      border: 0.8em solid transparent;
+      position: absolute;
+      left: -22px;
+      top: 6%;
+      border-right: 10px solid #eee;
     }
   }
 </style>
@@ -133,13 +159,23 @@
   <div class="top-screen" style="background-size: cover; background: url('{{post.cover_image}}') no-repeat center center;">
     <div class="shadow flex padding-lr padding-tb-sm bg-white margin-lr radius">
       <div class="avatar">
-        <image :src="post.user.avatar" mode="aspectFill"></image>
+        <block v-if="post.user.avatar">
+          <image :src="post.user.avatar" mode="aspectFill"></image>
+        </block>
+        <block v-else>
+           <open-data  type="userAvatarUrl"></open-data>
+        </block>
       </div>
       <div class="content margin-left-sm flex-sub">
         <div class="flex text-grey">
           <div class="flex-sub padding-top-xs">
             <div class="username">
-              {{post.user.username}}
+              <block v-if="post.user.username">
+                {{post.user.username}}
+              </block>
+              <block v-else>
+                 <open-data  type="userNickName"></open-data>
+              </block>
             </div>
             <div class="userinfo text-sm text-gray">
               <div class="age" v-if="post.user.age"> 年龄: {{post.user.age}} </div>
@@ -161,13 +197,13 @@
   <div class="shadow padding-lr padding-tb-sm bg-white">    
     <div class="top flex">
       <div class="flex-sub">
-        <span class="text-xs text-gray"> {{post.timestamp}} </span>
-        <div class="text-black margin-top-sm">
+        <div class="text-black text-lg margin-top-sm">
           {{post.title}}
-          <span class="label text-grey text-xs margin-top-xs">
+          <span class="label text-grey text-xs">
             {{"￥" + post.rent + " /月"}}
           </span>
         </div>
+        <span class="text-xs text-gray"> {{post.timestamp}} </span>
       </div>
       <div class="flex-sub flex align-top" style="justify-content: flex-end;">
         <div class="action">
@@ -175,11 +211,11 @@
           <span class="text-xs">{{like_count}}</span>
         </div>
         <div class="action">
-          <span class="cuIcon-messagefill margin-right-xs" :data-post="post.id" style="font-size: 19px;" @tap="clickLike"/>
-          <span class="text-xs">201</span>
+          <span class="cuIcon-messagefill margin-right-xs" :data-post="post.id" style="font-size: 19px;"/>
+          <span class="text-xs">{{post.comments.length}}</span>
         </div>
         <div class="action">
-          <span class="cuIcon-attentionfill margin-right-xs" :data-post="post.id" style="font-size: 19px;" @tap="clickLike"/>
+          <span class="cuIcon-attentionfill margin-right-xs" :data-post="post.id" style="font-size: 19px;"/>
           <span class="text-xs">1200</span>
         </div>
       </div>
@@ -277,23 +313,77 @@
   </div>
 
   <div class="comments padding bg-white margin-top">
-    <div class="bar text-sm">
-      评论 (46)
-    </div>
-    <div class="post-comment margin-top align-top">
-      <div class="avatar-sm">
-        <image :src="post.user.avatar" mode="aspectFill"></image>
+    <form bindsubmit="sendComment">
+      <div class="bar text-sm">
+        {{"评论 (" + post.comments.length + ")"}}
       </div>
-      <textarea placeholder="发表一个评论吧!" placeholder-style="color:gray;" maxlength="80" class="comment" bindinput="commentChange"/>
-    </div>
-    <div class="row padding-lr-sm margin-top-sm" style="justify-content: flex-end;">
-      <span class="comment-count margin-right-sm text-sm {{comment_count > 80 ? 'text-red' : 'text-grey'}}">
-        {{"( " + comment_count +"/80 )"}}
-      </span>
-      <div class="cu-btn line-orange sm" style="position: relative;float: right;">
-        <span class="iconfont icon-fabu"></span>
-        发表评论
+      <div class="post-comment margin-top align-top">
+        <div class="avatar-sm">
+          <block v-if="post.user.avatar">
+            <image :src="post.user.avatar" mode="aspectFill"></image>
+          </block>
+          <block v-else>
+             <open-data  type="userAvatarUrl"></open-data>
+          </block>
+        </div>
+        <textarea placeholder="发表一个评论吧!" name="comment" placeholder-style="color:gray;font-size:14px;" maxlength="80" :value="comment" class="comment" bindinput="commentChange"/>
       </div>
+      <div class="row padding-lr-sm margin-top-sm" style="justify-content: flex-end;">
+        <span class="comment-count margin-right-sm text-sm {{commentCount > 80 ? 'text-red' : 'text-grey'}}">
+          {{"( " + commentCount +"/80 )"}}
+        </span>
+        <button form-type="submit" class="cu-btn line-orange sm" style="position: relative;float: right;">
+          <span class="iconfont icon-fabu"></span>
+          发表评论
+        </button>
+      </div>
+    </form>
+
+    <block v-for="(comment, index) in post.comments" v-key="index">
+      <div class="row padding-top-sm align-top divider">
+        <div class="avatar-xs">
+          <image :src="comment.user.avatar" mode="aspectFill"></image>
+        </div>
+        <div class="column padding-left-xs align-start" style="width: 90%;">
+          <div class="user-info">
+            <span class="text-yellow text-sm">{{ comment.user.username }}</span>
+          </div>
+          <div class="comment text-sm">
+            {{comment.body}}
+          </div>
+          <div class="row between margin-top-sm" style="width: 100%;">
+            <span class="btn-link text-grey text-sm">{{ comment.tracer }}</span>
+            <span class="btn-link text-grey text-sm" @tap="reply" data-target="comment" :data-id="comment.id" :data-username="comment.user.username">回复</span>
+          </div>
+          <div class="divider margin-top-sm" style="width: 100%;"></div>
+        </div>
+      </div>
+    </block>
+  </div>
+
+  <div class="cu-modal bottom-modal" :class="{'show': showReplyModal}">
+    <div class="cu-dialog">
+      <form bindsubmit="submitReplyComment">
+        <div class="cu-bar bg-white padding-lr">
+          <div class="text-sm" @tap="cancel">取消</div>
+          <button class="cu-btn sm text-sm radius-sm bg-cyan padding-tb-xs padding-lr-sm" form-type="submit">
+            <span class="iconfont icon-fabu"></span>
+            发送
+          </button>
+        </div>
+        <div class="divider"></div>
+        <div class="flex bg-white text-left padding">
+          <div class="avatar-sm margin-left-sm">
+            <block v-if="post.user.avatar">
+              <image :src="post.user.avatar" mode="aspectFill"></image>
+            </block>
+            <block v-else>
+               <open-data  type="userAvatarUrl"></open-data>
+            </block>
+          </div>
+          <textarea placeholder="回复@{{replyTo}}" name="comment" placeholder-style="color:#ddd;font-size:14px;" class="comment-textarea" maxlength="80" :value="comment" bindinput="commentChange"/>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -302,7 +392,7 @@
   import wepy from '@wepy/core';
   import eventHub from '../common/eventHub';
   import { mapState } from '@wepy/x';
-  import { likePost, fetchPost } from '../common/api';
+  import { likePost, fetchPost, postComment, replyComment } from '../common/api';
 
   wepy.page({
 
@@ -311,7 +401,10 @@
       imageShow: null,
       like: false,
       like_count: 0,
-      comment_count: 0
+      commentCount: 0,
+      comment: null,
+      replyTo: null,
+      showReplyModal: false
     },
 
     methods: {
@@ -323,13 +416,57 @@
         })
       },
       commentChange(e){
-        this.comment_count = e.$wx.detail.value.length;
+        this.commentCount = e.$wx.detail.value.length;
+      },
+      cancel(e){        
+        this.showReplyModal = false;
+      },
+
+      sendComment(e){
+        if (this.commentCount > 0 && this.commentCount < 80) {
+          postComment(this.post.id, e.$wx.detail.value.comment).then(res => {
+            this.comment = '';
+            this.commentCount = 0;
+            wx.showToast({
+              title: '发送成功',
+              icon: 'success'
+            });
+          }).catch(err => {
+            wx.showToast({
+              title: '发表评论失败了~ 稍后再发吧!'
+            });
+          });
+        }
+      },
+
+      submitReplyComment(e){
+        let comment = e.$wx.detail.value.comment
+        console.log(comment);
+        if (comment.length > 0 && comment.length < 80) {
+          replyComment(this.replyCommentId, comment).then(res => {
+            this.showReplyModal = false;
+            wx.showToast({
+              title: '发送成功',
+              icon: 'success'
+            });
+          }).catch(err => {
+            wx.showToast({
+              title: '发表评论失败了~ 稍后再发吧!'
+            });
+          });
+        }
+      },
+
+      reply(e){
+        this.replyTo = e.currentTarget.dataset.username;
+        this.replyCommentId = e.currentTarget.dataset.id
+        this.showReplyModal = true
       }
     },
 
     onLoad(params, data) {
       // fetchPost(params[0]).then(post => {
-      fetchPost(2).then(post => {
+      fetchPost(4).then(post => {
         this.post = post
         this.imageShow = this.post.images[0].url
         this.like = this.post.like

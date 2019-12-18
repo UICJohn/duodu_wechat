@@ -101,7 +101,7 @@
       {{m.tag(post.type)}}
     </div>
     <div class="cover-img item" v-if="post.type != 'house_mate'">
-      <image :data-post="post.id" :src="post.image" mode="aspectFill" @tap="imageTapped" />
+      <image :data-post="post.id" :src="post.cover_image" mode="aspectFill" @tap="imageTapped" />
       <div class="price-tag padding-lr-sm" v-if="post.available_from">
         <div class="title text-cut">
           {{post.title}}

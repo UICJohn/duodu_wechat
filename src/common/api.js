@@ -245,6 +245,51 @@ const likePost = (post_id, like = true) => {
   }) 
 }
 
+const postComment = (postId, comment) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: BASE_URL + '/v1/post_comments',
+        header: header,
+        method: 'POST',
+        data: {
+          comment: {
+            post_id: postId,
+            body: comment
+          }
+        }
+      }).then(res => {
+        console.log(res);
+        resolve(res);
+      }).catch(err => {
+        reject(err);
+      })
+    })
+  })
+}
+
+const replyComment = (commentId, comment) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: BASE_URL + '/v1/post_comments/' + commentId + '/reply',
+        header: header,
+        method: 'POST',
+        data: {
+          comment: {
+            body: comment
+          }
+        }
+      }).then(res => {
+        resolve(res);
+      }).catch(err => {
+        reject(err);
+      })
+    })
+  })
+}
+
+
 module.exports = {
   authenticate: authenticate,
   createPost: createPost,
@@ -259,5 +304,7 @@ module.exports = {
   fetchPost: fetchPost,
   fetchSuburbs: fetchSuburbs,
   fetchSubways: fetchSubways,
-  likePost: likePost
+  likePost: likePost,
+  postComment: postComment,
+  replyComment: replyComment
 }

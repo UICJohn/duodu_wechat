@@ -14,6 +14,11 @@
     font-size: 16px;
   }
 
+  .column {
+    display: flex;
+    flex-direction: column;
+  }
+
   .row {
     display: flex;
     flex-direction: row;
@@ -59,15 +64,59 @@
     bottom: 4px;
   }
 
-  .avatar, .avatar-sm {
+  .avatar-xs {
+    width: 30px;
+    height: 30px;
+  }
+
+  .avatar-xs image{
+    width: 35px;
+    height: 35px;
+    bottom: 4px;
+  }
+
+  .avatar, .avatar-sm, .avatar-xs{
     border-radius: 50%;
     border: 2px solid #D0A475;
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
     overflow: hidden;
   }
 
-  .align-top {
+  .align-start, .align-top {
     align-items: start;
+  }
+
+  .align-end {
+    justify-content: flex-end;
+  }
+
+  .divider {
+    &:before {
+      content: "";
+      display: block;
+      border-bottom: 1px solid #E8E8EE;
+      z-index: 0;
+    }
+  }
+
+  .between {
+    justify-content: space-between;
+  }
+
+  .btn-link {
+    background: transparent;
+    &:after {
+      border: none;
+    }
+  }
+
+  .radius-sm {
+    border-radius: 3px;
+  }
+
+  textarea {
+    border-radius: 10px;
+    border: 1px solid #E8E8EE;
   }
 </style>
 
@@ -119,9 +168,7 @@
         });
 
         eventHub.$on('open-setting', (msg) => {
-          wepy.wx.openSetting().catch((err) => {
-            
-          })
+          wepy.wx.openSetting()
         });
 
       }
