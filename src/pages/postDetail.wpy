@@ -201,9 +201,9 @@
   <div class="shadow padding-lr padding-tb-sm bg-white">    
     <div class="top flex">
       <div class="flex-sub">
-        <div class="text-black text-lg margin-top-sm">
-          {{post.title}}
-          <span class="label text-grey text-xs">
+        <div class="row text-black text-lg align-center">
+          <span>{{post.title}}</span>
+          <span class="label text-grey text-xs margin-left-xs">
             {{"￥" + post.rent + " /月"}}
           </span>
         </div>
@@ -356,9 +356,9 @@
         </div>
 
         <div v-if="comment.sub_comments.length > 0" class="sub_comments_block bg-gray padding-sm margin-top-sm">
-          <div class="row align-center" v-for="(subComment, index) in comment.sub_comments" v-key="index">
-            <span class="text-sm text-blue">{{subComment.user.username + ": "}}</span>
-            <span class="margin-left-xs text-grey text-sm">{{subComment.body}}</span>
+          <div class="row align-top" v-for="(subComment, index) in comment.sub_comments" v-key="index">
+            <span class="text-sm text-blue" style="width: 35%">{{subComment.user.username + ": "}}</span>
+            <span class="text-grey text-sm" style="width: 65%;padding-top: 4rpx;">{{subComment.body}}</span>
           </div>
         </div>
 
@@ -459,6 +459,7 @@
           replyComment(this.replyCommentId, comment).then(res => {
             this.showReplyModal = false;
             this.replyMsg = '';
+            console.log(res.data.comments);
             this.comments = res.data.comments
             wx.showToast({
               title: '发送成功',
