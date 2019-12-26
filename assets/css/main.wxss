@@ -24,6 +24,7 @@ page {
 	--mauve: #9c26b0;
 	--pink: #e03997;
 	--brown: #a5673f;
+	--darkbrown: #6c6351;
 	--grey: #8799a3;
 	--black: #333333;
 	--darkGray: #666666;
@@ -3884,6 +3885,11 @@ scroll-view.cu-steps .cu-item {
 	color: var(--olive);
 }
 
+.text-darkbrown,
+.line-darkbrown,
+.lines-darkbrown {
+	color: var(--darkbrown);
+}
 .text-green,
 .line-green,
 .lines-green {
