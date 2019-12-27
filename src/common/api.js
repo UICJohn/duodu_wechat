@@ -290,6 +290,40 @@ const replyComment = (commentId, comment) => {
 }
 
 
+const fetchSurvey = (survey_name) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: BASE_URL + '/v1/report_posts/survey',
+        header: header,
+        method: 'get',
+        data: { survey_name: survey_name }
+      }).then(res => {
+        resolve(res.data);
+      }).catch(err => {
+        reject(err);
+      })
+    })
+  })
+}
+
+const sendSurvey = (data) => {
+  return new Promise((resolve, reject) => {
+    fetchTokenHeader().then((header) => {
+      request({
+        url: BASE_URL + '/v1/report_posts',
+        header: header,
+        method: 'POST',
+        data: data
+      }).then(res => {
+        resolve(res.data);
+      }).catch(err => {
+        reject(err);
+      })
+    })
+  })
+}
+
 module.exports = {
   authenticate: authenticate,
   createPost: createPost,
@@ -306,5 +340,7 @@ module.exports = {
   fetchSubways: fetchSubways,
   likePost: likePost,
   postComment: postComment,
-  replyComment: replyComment
+  replyComment: replyComment,
+  fetchSurvey: fetchSurvey,
+  sendSurvey: sendSurvey
 }

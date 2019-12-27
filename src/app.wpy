@@ -83,7 +83,7 @@
   }
 
   .align-start, .align-top {
-    align-items: start;
+    align-items: left;
   }
 
   .flex-end {
@@ -99,7 +99,7 @@
     }
   }
 
-  .between {
+  .flex-between {
     justify-content: space-between;
   }
 

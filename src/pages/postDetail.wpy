@@ -338,8 +338,14 @@
 
   <div class="comments padding bg-white">
     <form bindsubmit="sendComment">
-      <div class="bar text-sm">
-        {{"评论 (" + comments.length + ")"}}
+      <div class="bar text-sm flex-between">
+        <div>
+          {{"评论 (" + comments.length + ")"}}
+        </div>
+        <div class="text-sm text-grey" @tap="fetchReportSurvey">
+          <span class="iconfont icon-report"></span>
+          <span>报错</span>
+        </div>
       </div>
       <div class="post-comment margin-top align-top">
         <div class="avatar-sm">
@@ -417,13 +423,45 @@
       </form>
     </div>
   </div>
+
+  <div class="cu-modal" :class="{show: showSurvey}" >
+    <div class="cu-dialog">
+      <div class="cu-bar bg-white padding-lr">
+        {{ survey.title }}
+      </div>
+      <div class="block">
+        <form bindsubmit="reportPost">
+          <radio-group name="survey_option_id" class="cu-list menu text-left">
+            <div class="cu-item" :class="{column: option.custom_option, 'align-start': option.custom_option }" v-for="(option, index) in survey.options" style="{{ option.custom_option ? 'align-items: unset;' : '' }}">
+              <div class="flex justify-between align-center flex-sub" :class="{'margin-tb-sm': option.custom_option}">
+                <div class="flex-sub">{{ option.body }}</div>
+                <radio class="round" :value="option.id">
+                  <div class="uni-radio-wrapper">
+                    <div class="uni-radio-input"></div>
+                  </div>
+                </radio>
+              </div>
+               <textarea v-if="option.custom_option && showSurvey" placeholder="简述一下问题" fixed="true" name="body" placeholder-style="color:#ddd;font-size:14px;" class="radius-sm margin-bottom-sm padding-xs" maxlength="80" :value="reportBody" style="width: 100%"/>
+            </div>
+          </radio-group>
+          <div class="cu-bar bg-white padding-lr">
+            <div class="text-sm" @tap="cancel">取消</div>
+            <button class="cu-btn sm text-sm radius-sm bg-cyan padding-tb-xs padding-lr-sm" form-type="submit">
+              <span class="iconfont icon-fabu"></span>
+              提交
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
   import wepy from '@wepy/core';
   import eventHub from '../common/eventHub';
   import { mapState } from '@wepy/x';
-  import { likePost, fetchPost, postComment, replyComment } from '../common/api';
+  import { likePost, fetchPost, postComment, replyComment, fetchSurvey, sendSurvey} from '../common/api';
 
   wepy.page({
 
@@ -438,7 +476,10 @@
       replyTo: null,
       showReplyModal: false,
       comments: null,
-      markers: null
+      markers: null,
+      survey: null,
+      showSurvey: false,
+      reportBody: null,
     },
 
     methods: {
@@ -454,6 +495,7 @@
       },
       cancel(e){        
         this.showReplyModal = false;
+        this.showSurvey = false;
       },
 
       previewImg(e) {
@@ -480,6 +522,26 @@
             });
           });
         }
+      },
+
+      reportPost(e) {
+        console.log(e);
+        sendSurvey({
+          post_id: this.post.id,
+          report: { ...e.$wx.detail.value, survey_id: this.survey.id }
+        }).then(res => {
+          wx.showToast({
+            title: '提交成功',
+            icon: 'success'
+          });
+          this.showSurvey = false;
+        }).catch(res => {
+          wx.showToast({
+            title: '提交成功',
+            icon: 'success'
+          });
+          this.showSurvey = false;
+        })
       },
 
       getRouter(e) {
@@ -518,6 +580,14 @@
         this.replyTo = e.currentTarget.dataset.username;
         this.replyCommentId = e.currentTarget.dataset.id
         this.showReplyModal = true
+      },
+
+      fetchReportSurvey(e) {
+        fetchSurvey('report_post').then(survey => {
+          console.log(survey);
+          this.survey = survey
+          this.showSurvey = true
+        })
       }
     },
 
