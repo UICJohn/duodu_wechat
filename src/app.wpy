@@ -180,7 +180,6 @@
 <config>
 {
   pages: [
-    'pages/postDetail',
     'pages/home',
     'pages/account',
     'pages/nearby',
@@ -189,7 +188,7 @@
   subPackages:[
     {
       root: 'pages/home/',
-      pages: ['cities', 'house', 'housemate']
+      pages: ['cities', 'house', 'housemate', 'postDetail']
     },
     {
       root: 'pages/account/',

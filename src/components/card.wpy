@@ -36,6 +36,24 @@
     max-height: 220px;
   }
 
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .avatar, .avatar-sm, .avatar-xs{
+    border-radius: 50%;
+    border: 2px solid #D0A475;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+
+  .avatar image{
+    width: 60px;
+    height: 60px;
+    bottom: 10px;
+  }
+
   .cover-img .cu-tag {
     position: absolute;
     right: 0;
@@ -109,10 +127,10 @@
       </div>
       <div class="cu-bar bg-shadeBottom padding-lr-sm">
         <div>
-          <span class="cu-tag bg-pink radius" style="position: relative;">
+          <span class="cu-tag bg-pink radius-sm" style="position: relative;">
             {{post.available_from + '后可入住'}}
           </span>
-          <span class="cu-tag bg-green radius" style="position: relative;">
+          <span class="cu-tag bg-green radius-sm" style="position: relative;">
             {{post.rent + '元/月'}}
           </span>
         </div>
@@ -123,7 +141,14 @@
     </div>
 
     <div class="flex item padding-lr padding-tb-sm bg-white">
-      <div class="cu-avatar round lg" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg);"></div>
+      <div class="avatar margin-top-xs">
+        <block v-if="post.user.avatar">
+          <image :src="post.user.avatar" mode="aspectFill"></image>
+        </block>
+        <block v-else>
+           <open-data  type="userAvatarUrl"></open-data>
+        </block>
+      </div>
       <div class="content margin-left-sm flex-sub">
         <div class="text-grey margin-top-xs" v-if="post.type != 'house_mate'">
           {{post.user.username}}
@@ -146,11 +171,11 @@
           </div>
           <div class="flex align-center text-gray">
             <span class="iconfont {{like ? 'icon-like-fill text-red' : 'icon-like'}} margin-left" :data-post="post.id" style="font-size: 20px;" @tap="clickLike"/>
-            <text class="text-black" style="margin-left: 2rpx">281</text>
-            <span class="cuIcon-attentionfill margin-left" style="margin-right: 3rpx; font-size: 20px;"/>
-            <text class="text-black">1.2K</text>
-            <span class="cuIcon-messagefill margin-left" style="margin-right: 3rpx; font-size: 17px;"/>
-            <text class="text-black">14</text>
+            <text class="text-black" style="margin-left: 2rpx">{{ post.like_count }}</text>
+            <span class="cuIcon-messagefill margin-left-sm" style="margin-right: 3rpx; font-size: 17px;"/>
+            <text class="text-black">{{ post.comments_count }}</text>
+            <span class="cuIcon-attentionfill margin-left-sm" style="margin-right: 3rpx; font-size: 20px;"/>
+            <text class="text-black">{{ post.view_count }}</text>
           </div>
         </div>
       </div>

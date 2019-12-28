@@ -42,7 +42,7 @@
       <input disabled="1" placeholder="{{location.name || '搜索宇宙'}}" class="paddint-sm" :style="{paddingLeft: '4rpx', width: '195px'}" @tap="chooseLocation"/>
     </div>
     <div class="flex align-center margin-sm">
-      <div class="cu-btn block bg-cyan sm radius" @tap="newPost">
+      <div class="cu-btn block bg-cyan sm radius-sm" @tap="newPost">
         <span class="iconfont icon-send" :style="{fontSize: '16px', marginRight: '5rpx'}"/>
         <text :style="{fontSize: '14px'}">发布</text>
       </div>

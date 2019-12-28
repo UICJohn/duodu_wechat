@@ -42,7 +42,7 @@
         简介
         <span class="require">*</span>
       </div>
-      <textarea v-model="body" placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..."></textarea>
+      <textarea v-model="body" placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..." style="border-style: none;"></textarea>
     </div>
 
     <div class="cu-form-group">
@@ -63,13 +63,12 @@
       </div>
     </div>
 
-
     <div class="cu-form-group">
       <div class="title">
         租金范围
       </div>
       <input name="min_rent" v-model="minRent" type="number" placeholder="最低" :style="{width: '20px', textAlign: 'center'}"/>
-      -
+      {{minRent ? '-' : ''}}
       <input name="max_rent" type="number" v-model="maxRent" placeholder="最高" :style="{width: '20px', textAlign: 'center'}"/>
       <div class="footer">
         元/月
@@ -86,14 +85,13 @@
       </div>
     </div>
 
-
     <div class="bg-white padding-sm address-container">
       <div class="flex solid line-pink round padding-tb-xs margin-lr-sm margin-tb-xs" v-for="(item, index) in locations" v-key="index">
         <div class="cu-tag bg-white" :data-name="item.name" style="width: 5%; justify-content: unset" @tap="delLocation">
           <text class="cuIcon-close"></text>
         </div>
         <div class="padding-lr-sm text-cut" style="padding-top:2px;">
-          <text>{{item.address}}</text>
+          <text>{{item.name}}</text>
         </div>
       </div>
 
@@ -191,7 +189,6 @@
       hasCookTop: false,
       hasAppliance: false,
       hasNetwork: false,
-
       // other
       showStatus: false,
       error: null,
@@ -228,6 +225,7 @@
         })
         this.locations = locations
       },
+
       showStatusBar(){
         this.showStatus = true
         let _this = this;
@@ -235,6 +233,7 @@
           _this.showStatus = false
         }, 2000);
       },
+
       submit(e) {
         let form = {
           title: this.title,
@@ -268,15 +267,19 @@
           }, 2000);
         })
       },
-      chooseLocation(e) {        
+      chooseLocation(e) {
         wepy.wx.chooseLocation().then((res) => {
-          console.log(res)
-          this.locations.push({
-            name: res.name,
-            address: res.address,
-            longitude: res.longitude,
-            latitude: res.latitude
-          })
+          if (res.name) {
+            let _locations = this.locations
+            _locations.push({
+              name: res.name,
+              address: res.address,
+              latitude: res.latitude,
+              longitude: res.longitude
+            })
+            this.locations = [..._locations]
+          }
+          console.log(this.locations);
         }).catch((err) => {
           wepy.wx.getSetting().then((res) => {
             if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
