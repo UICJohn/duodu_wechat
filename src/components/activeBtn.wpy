@@ -1,6 +1,24 @@
 <style lang="less">
   @import "../../assets/css/icon.wxss";
   @import "../../assets/css/iconfont.wxss";
+
+  .condition-span {
+    box-shadow: 0px 1px 5px 1px gray;
+    width: 100rpx;
+    height: 100rpx;
+    &.active{
+      color: #fff;
+      background-color: #0081ff;
+      border: none;
+    }
+
+    &.inactive{
+      color: #0081ff;
+      background-color: #E8E8EE;
+      border: none;
+    }
+  }
+
   .title {
     text-align: left;
   }
@@ -24,7 +42,7 @@
 </style>
 
 <template>
-  <div class="{{btnType}} container" :style="{border: '1rpx solid #33A6B8', color: '#33A6B8', backgroundColor: (actived ? activeBackground : backgroundColor)}" @tap="setStatus">
+  <div class="{{btnType}} container condition-span" :style="{border: '1rpx solid #33A6B8', color: '#33A6B8', backgroundColor: (actived ? activeBackground : backgroundColor)}" @tap="setStatus">
     <block v-if="icon">
       <span class="{{icon}}" :style="{color: (actived ? activeColor : color), fontSize: size + 'px'}"/>
     </block>

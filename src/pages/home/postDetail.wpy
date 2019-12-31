@@ -8,6 +8,13 @@
     border: 1px solid grey;
   }
 
+  .map-cover {
+    position: absolute;
+    width: 100%;
+    height: 250px;
+    z-index: 10;
+  }
+
   .top-screen {
     width: 100%;
     height: 180px;
@@ -56,34 +63,24 @@
     }
   }
 
-  .condition-span {
-    box-shadow: 0px 1px 5px 1px gray;
-    padding-top: 13px;
-    width: 100rpx;
-    height: 100rpx;
-    &.active{
-      color: #fff;
-      background-color: #0081ff;
-      border: none;
-    }
-
-    &.inactive{
-      color: #0081ff;
-      background-color: #E8E8EE;
-      border: none;
-    }
-  }
-
-  .other-conditions .col{
+  .conditions .col{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    &.active {
+      color: #1cbbb4;
+    }
+    &.inactive {
+      color: rgba(114, 130, 138, 0.5);
+    }
     .condition-span {
-      padding-top: 13px;
       label {
         font-size: 28px;
-      }
+      }   
+      padding-top: 13px;
+      width: 100rpx;
+      height: 100rpx;
     }
   }
 
@@ -148,12 +145,8 @@
   }
 </style>
 
-<wxs module="m" lang="babel">
-
-</wxs>
-
 <template>
-  <div class="top-screen" style="background-size: cover; background: url('{{post.cover_image}}') no-repeat center center;">
+  <div class="top-screen" style="background-size: cover; background: url('{{imageShow}}') no-repeat center center;">
     <div class="shadow flex padding-lr padding-tb-sm bg-white margin-lr radius">
       <div class="avatar">
         <block v-if="post.user.avatar">
@@ -197,10 +190,16 @@
         <div class="row text-black text-lg align-center">
           <span>{{post.title}}</span>
           <span class="label text-white bg-blue text-xs margin-left-xs padding-sm radius-sm">
-            {{ post.type == 'Post::TakeHouse' ?  '整租' : (post.type == 'Post::HouseMate' ? '找室友' : '分租')}}
+            {{ post.type == 'Post::TakeHouse' ?  '整租' : (post.type == 'house_mate' ? '找室友' : '分租')}}
           </span>
-          <span class="label text-grey text-xs margin-left-xs">
-            {{"￥" + post.rent + " /月"}}
+          <span class="label text-grey text-xs margin-left-xs" v-if="post.type != 'house_mate'">
+            ￥{{post.rent}}/月
+          </span>
+
+          <span class="label text-grey text-xs margin-left-xs" v-else>
+            <block v-if="post.max_rent || post.min_rent">
+              ￥{{post.min_rent ? (post.min_rent + '-') : ''}}{{post.max_rent ? post.max_rent : '不限'}}/月
+            </block>
           </span>
         </div>
         <span class="text-xs text-gray"> {{post.timestamp}} </span>
@@ -224,8 +223,8 @@
       {{ post.body }}
     </div>
 
-    <div class="main-conditions margin-tb">
-      <div class="main-condition padding-top flex text-grey radius shadow" v-if="post.type == 'Post::ShareHouse'">
+    <div class="main-conditions margin-tb" v-if="post.type != 'house_mate' ">
+      <div class="main-condition padding-top flex text-grey radius shadow" v-if="post.type == 'share_house'">
         <span class="iconfont icon-friends"></span>
         <text class="margin-top-sm" style="font-size: 18px;">{{post.tenants}}</text>
       </div>
@@ -244,7 +243,7 @@
     </div>
   </div>
 
-  <div class="shadow bg-white padding-tb" v-if="post.type != 'Post::HouseMate'">
+  <div class="shadow bg-white padding-tb" v-if="post.type != 'house_mate'">
     <div class="bar padding-bottom-sm padding-lr">
       <div class="flex-sub text-grey text-sm">所有图片</div>
     </div>
@@ -260,54 +259,93 @@
     </div>
   </div>
 
-  <div class="shadow bg-white" v-if="post.type != 'Post::HouseMate' ">
+  <div class="shadow bg-white" v-if="post.type == 'house_mate' ">
     <div class="bar padding-left padding-tb-sm">
-      <div class="flex-sub text-grey text-sm">房屋情况</div>
+      <div class="flex-sub text-grey text-sm">
+        个人情况
+      </div>
     </div>
-    <div class="other-conditions grid flex-sub col-4">
-      <div class="col margin-tb-sm">
-        <div class="condition-span text-center padding-top-xs round {{post.has_furniture == true ? 'active' : 'inactive'}}">
+    <div class="conditions grid flex-sub col-4">
+      <div class="col margin-tb-sm {{post.smoker == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
+          <span class="iconfont icon-cigarette"></span>
+        </div>
+        <div class="text-xs margin-tb-xs">抽烟</div>
+      </div>
+
+      <div class="col margin-tb-sm {{post.has_pets == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
+          <span class="iconfont icon-pet"></span>
+        </div>
+        <div class="text-xs margin-tb-xs">宠物</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shadow bg-white">
+    <div class="bar padding-left padding-tb-sm">
+      <div class="flex-sub text-grey text-sm">
+        <block v-if="post.type != 'house_mate' ">
+          房屋情况
+        </block>
+        <block v-else>
+          租房要求
+        </block>
+      </div>
+    </div>
+
+    <div class="conditions grid flex-sub col-4">
+      <div class="col margin-tb-sm {{post.has_furniture == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
           <span class="iconfont icon-furniture"></span>
         </div>
         <div class="text-xs margin-tb-xs">家具</div>
       </div>
 
-      <div class="col margin-tb-sm">
-        <div class="condition-span text-center padding-top-xs round {{post.has_network == true ? 'active' : 'inactive'}}">
+      <div class="col margin-tb-sm {{post.has_network == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
           <span class="iconfont icon-internet"></span>
         </div>
         <div class="text-xs margin-tb-xs">网络</div>
       </div>
 
-      <div class="col margin-tb-sm">
-        <div class="condition-span text-center padding-top-xs round {{post.has_elevator == true ? 'active' : 'inactive'}}">
+      <div class="col margin-tb-sm {{post.has_elevator == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
           <span class="iconfont icon-elevator"></span>
         </div>
         <div class="text-xs margin-tb-xs">电梯</div>
       </div>
-      <div class="col margin-tb-sm">
-        <div class="condition-span text-center padding-top-xs round {{post.pets_allow == true ? 'active' : 'inactive'}}">
+      <div class="col margin-tb-sm {{post.pets_allow == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
           <span class="iconfont icon-pet"></span>
         </div>
         <div class="text-xs margin-tb-xs">宠物</div>
       </div>
-      <div class="col margin-tb-sm">
-        <div class="condition-span text-center padding-top-xs round {{ post.has_appliance == true ? 'active' : 'inactive' }}">
+      <div class="col margin-tb-sm {{post.has_appliance == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
           <span class="iconfont icon-appliance"></span>
         </div>
         <div class="text-xs margin-tb-xs">家电</div>
       </div>
-      <div class="col margin-tb-sm">
-        <div class="condition-span text-center padding-top-xs round {{ post.has_cooktop == true ? 'active' : 'inactive' }}">
+      <div class="col margin-tb-sm {{post.has_cook_top == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
           <span class="iconfont icon-cooktop"></span>
         </div>
         <div class="text-xs margin-tb-xs">炉灶</div>
       </div>
-      <div class="col margin-tb-sm">
-        <div class="condition-span text-center padding-top-xs round {{ post.smoke_allow == true ? 'active' : 'inactive' }}">
+      <div class="col margin-tb-sm {{post.smoke_allow == true ? 'active' : 'inactive'}}">
+        <div class="condition-span text-center padding-top-xs round">
           <span class="iconfont icon-cigarette"></span>
         </div>
         <div class="text-xs margin-tb-xs">可否抽烟</div>
+      </div>
+      <div class="col margin-tb-sm {{post.tenants_gender == 'male' ? 'text-cyan' : 'text-pink'}}" v-if="post.tenants_gender != 'unisex'">
+        <div class="condition-span text-center padding-top-xs round">
+          <span class="iconfont icon-{{post.tenants_gender == 'male' ? 'male' : 'female'}}"></span>
+        </div>
+        <div class="text-xs margin-tb-xs">
+          {{ post.tenants_gender == 'male' ? "只找男生" : "只找女生"}}
+        </div>
       </div>
     </div>
   </div>
@@ -315,21 +353,21 @@
   <div class="divider" style="width: 100%;"></div>
 
   <div class="map-sm bg-white">
+    <div class="map-cover" @tap="getRouter"></div>
     <map id="myMap"
-    markers="{{markers}}"
-    style="width:100%;height:250px;"
-    longitude="{{post.location.longitude}}"
-    latitude="{{post.location.latitude}}"
-    bindtap="getRouter"
-    :enable-zoom="false"
-    :enable-scroll="false"
-    :show-compass="true"
-    show-location>
+      markers="{{markers}}"
+      style="width:100%;height:250px;"
+      longitude="{{post.location.longitude}}"
+      latitude="{{post.location.latitude}}"
+      :enable-zoom="false"
+      :enable-scroll="false"
+      :show-compass="true"
+      show-location>
     </map>
     <div class="bar padding-tb-xs flex-end padding-lr">
       <div class="row text-grey text-xs align-center">
         <span class="cuIcon-locationfill"></span>
-        {{ post.location.name + " " + post.location.suburb.name + " " + post.location.city.name }}
+          {{ (post.type == "house_mate" ? "" : post.location.name + " ") + post.location.suburb.name + " " + post.location.city.name }}        
       </div>
     </div>
   </div>
@@ -356,7 +394,7 @@
              <open-data  type="userAvatarUrl"></open-data>
           </block>
         </div>
-        <textarea v-if="!showReplyModal || !showReply" placeholder="发表一个评论吧!" name="comment" placeholder-style="color:gray;font-size:14px;" maxlength="80" :value="comment" class="comment" bindinput="commentChange"/>
+        <textarea v-if="!(showSurvey || showReply)" placeholder="发表一个评论吧!" name="comment" placeholder-style="color:gray;font-size:14px;" maxlength="80" :value="comment" class="comment" bindinput="commentChange"/>
       </div>
       <div class="row padding-lr-sm margin-top-sm" style="justify-content: flex-end;">
         <span class="comment-count margin-right-sm text-sm {{commentCount > 80 ? 'text-red' : 'text-grey'}}">
@@ -459,15 +497,12 @@
 
 <script>
   import wepy from '@wepy/core';
-  import eventHub from '../../common/eventHub';
-  import { mapState } from '@wepy/x';
   import { likePost, fetchPost, postComment, replyComment, fetchSurvey, sendSurvey} from '../../common/api';
 
   wepy.page({
 
     data: {
       post: null,
-      imageShow: null,
       like: false,
       like_count: 0,
       commentCount: 0,
@@ -480,6 +515,7 @@
       survey: null,
       showSurvey: false,
       reportBody: null,
+      imageShow: "https://duodu-storage.oss-cn-zhangjiakou.aliyuncs.com/assets/pexels-photo-1519088.jpeg"
     },
 
     methods: {
@@ -557,17 +593,20 @@
       },
 
       getRouter(e) {
-        let plugin = requirePlugin('router');
-        let key = 'JOSBZ-BQF66-UWJSP-M6TNG-SPBZQ-O7BS4';  //使用在腾讯位置服务申请的key
-        let referer = '多度';   //调用插件的app的名称
-        let endPoint = JSON.stringify({  //终点
-          'name': this.post.location.name,
-          'latitude': this.post.location.latitude,
-          'longitude': this.post.location.longitude
-        });
-        wx.navigateTo({
-          url: 'plugin://router/index?key=' + key + '&referer=' + referer + '&endPoint=' + endPoint
-        });
+        console.log(e)
+        if (this.post.type != "house_mate") {
+          let plugin = requirePlugin('router');
+          let key = 'JOSBZ-BQF66-UWJSP-M6TNG-SPBZQ-O7BS4';  //使用在腾讯位置服务申请的key
+          let referer = '多度';   //调用插件的app的名称
+          let endPoint = JSON.stringify({  //终点
+            'name': this.post.location.name,
+            'latitude': this.post.location.latitude,
+            'longitude': this.post.location.longitude
+          });
+          wx.navigateTo({
+            url: 'plugin://router/index?key=' + key + '&referer=' + referer + '&endPoint=' + endPoint
+          });
+        }
       },
       submitReplyComment(e){
         let comment = e.$wx.detail.value.comment
@@ -605,21 +644,26 @@
 
     onLoad(params) {
       fetchPost(params[0]).then(post => {
+        console.log(post);
         this.post = post
-        this.imageShow = this.post.images[0].url
         this.like = this.post.like
         this.like_count = this.post.like_count
         this.comments = this.post.comments
+
+        if (post.type != "house_mate") {
+          this.imageShow = post.cover_image ? post.cover_image : this.imageShow = this.post.images[0].url
+        }
+
         this.markers = [{
-          title: post.location.address,
           id: 0,
+          title: post.location.address,
           latitude: post.location.latitude,
           longitude: post.location.longitude,
           iconPath: '/assets/images/marker.png',
           width: 20,
           height: 20,
           callout: {
-            content: post.location.name,
+            content: (post.location.name ? post.location.name : post.location.address),
             color: '#e03997',
             padding: '3px',
             borderRadius: '3px',

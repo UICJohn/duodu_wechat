@@ -99,6 +99,17 @@
     }
   }
 
+
+  .divider-vertical {
+    &:before {
+      content: "";
+      display: block;
+      border-bottom: 1px solid #E8E8EE;
+      transform: rotate(30deg);
+      z-index: 0;
+    }
+  }
+
   .flex-between {
     justify-content: space-between;
   }

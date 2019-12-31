@@ -31,6 +31,32 @@
 
 </style>
 
+
+<wxs module="m" lang="babel">
+  const locationMarker = (post) => {
+    return [{
+      title: post.location.address,
+      id: 0,
+      latitude: post.location.latitude,
+      longitude: post.location.longitude,
+      iconPath: '/assets/images/marker.png',
+      width: 20,
+      height: 20,
+      callout: {
+        content: post.location.name,
+        color: '#e03997',
+        padding: '3px',
+        borderRadius: '3px',
+        display: 'ALWAYS'
+      }
+    }];
+  }
+
+  module.exports = {
+    locationMarker: locationMarker
+  }
+</wxs>
+
 <template>  
   <div class="flex align-center top padding-sm" :style="{position: 'sticky', top: 0, zIndex: 999}" >
     <div class="row margin-sm" @tap="navigateTo" data-path="home/cities">
@@ -56,7 +82,12 @@
 
   <scroll-view class="content">
     <block v-for="post in posts" v-key="post.id">
-      <card :post="post" :like="post.like" clickEvent="showDetail"/>
+      <card 
+        :post="post" 
+        :like="post.like"
+        :markers="m.locationMarker(post)"
+        clickEvent="showDetail"
+      />
     </block>
   </scroll-view>
 
