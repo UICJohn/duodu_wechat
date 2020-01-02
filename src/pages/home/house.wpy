@@ -29,7 +29,7 @@
       简介
       <span class="require">*</span>
     </div>
-    <textarea v-model="body" placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..."></textarea>
+    <textarea v-model="body" placeholder="添加一些描述，如对室友的要求：晚归、养宠物、带异性回家等..." style="border-style: none;"></textarea>
   </div>
 
   <div class="cu-form-group margin-top">
@@ -37,7 +37,7 @@
       地址
       <span class="require">*</span>
     </div>
-    <input disabled="1" placeholder="选择地点或者小区" v-model="location.address" @tap="chooseLocation"/>
+    <input disabled="1" placeholder="选择地点或者小区" v-model="location.address" @tap="setLocation"/>
     <div class="action">
       <div class="cuIcon-right"></div>
     </div>
@@ -135,29 +135,29 @@
     </div>
   </div>
   <div class="grid col-4 padding-lr padding-bottom bg-white">
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="iconfont icon-internet" attrName="hasNetwork"/>
       <text class="text-grey text-sm">网络</text>
     </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="iconfont icon-appliance" attrName="hasAppliance"/>
       <text class="text-grey text-sm">家电</text>
     </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="iconfont icon-furniture" attrName="hasFurniture"/>
       <text class="text-grey text-sm">家具</text>
     </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="iconfont icon-cooktop" attrName="hasCookTop"/>
       <text class="text-grey text-sm">炉灶</text>
     </div>
   </div>
   <div class="grid col-4 padding-lr padding-bottom bg-white">
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="iconfont icon-elevator" attrName="hasElevator"/>
       <text class="text-grey text-sm">电梯</text>
     </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="iconfont icon-aircon" attrName="hasAirConditioner"/>
       <text class="text-grey text-sm">空调</text>
     </div>
@@ -169,19 +169,19 @@
     </div>
   </div>
   <div class="grid col-4 padding-lr padding-bottom bg-white">
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="iconfont icon-cigarette" attrName="smokeAllow"/>
       <text class="text-grey text-sm">可以抽烟</text>
     </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="iconfont icon-pet" attrName="petsAllow"/>
       <text class="text-grey text-sm">可以养宠物</text>
     </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="cuIcon-female" attrName="allowFemale"/>
       <text class="text-grey text-sm">只租女生</text>
     </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding-top: 3px; display: flex; flex-direction: column; align-items: center;">
       <activeBtn icon="cuIcon-male" attrName="allowMale"/>
       <text class="text-grey text-sm">只租男生</text>
     </div>
@@ -461,26 +461,32 @@
         this.images = images
       },
 
-      chooseLocation(e) {
-        wepy.wx.chooseLocation().then((res) => {
-          console.log(res);
-          this.location = {
-            name: res.name,
-            address: res.address,
-            longitude: res.longitude,
-            latitude: res.latitude
-          }
-        }).catch((err) => {
-          wepy.wx.getSetting().then((res) => {
-            if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
-              this.modalInfo = {
-                title: '获取地理位置',
-                body: '获取地理位置将帮助我们为您找到更合适的房源或室友, 请前往权限中心设置',
-                confirmEvent: 'open-setting'
+      setLocation(e) {
+        let _this = this;
+        wx.chooseLocation({
+          success: function(res){
+            _this.location = {
+              name: res.name,
+              address: res.address,
+              longitude: res.longitude,
+              latitude: res.latitude
+            } 
+          },
+          fail: function(err){
+            wx.getSetting({
+              success: function(res) {
+                if(res.authSetting.length != 0 && !res.authSetting["scope.userLocation"]) {
+                  _this.modalInfo = {
+                    title: '获取地理位置',
+                    body: '获取地理位置将帮助我们为您找到更合适的房源或室友, 请前往权限中心设置',
+                    confirmEvent: 'open-setting'
+                  }
+                  _this.showModal = true;
+                }
               }
-              this.showModal = true;    
-            }
-          })
+            })
+            
+          }
         })
       },
 

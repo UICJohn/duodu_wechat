@@ -203,7 +203,6 @@ const fetchPost = (id) => {
         header: header,
         method: 'GET'
       }).then(res => {
-        console.log(res);
         resolve(res.data.post);
       })
     })
