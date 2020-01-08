@@ -1,29 +1,90 @@
 <style lang="less">
+  .list .item {
+    background: #fff;
+    padding: 5px 15px;
+    border-top: 1px solid #eee;
+  }
+
+  .list .item .head {
+    padding-top: 2px;
+    width: 10%;
+    position: relative;
+    .cu-tag {
+      position: absolute;
+      left: 22px;
+      top: -3px;
+    }
+  }
+
+  .list .item .content {
+    padding-left: 7px;
+    width: 70%;
+  }
+
+  .list .item .action {
+    text-align: right;
+    width: 20%
+  }
 
 </style>
 
 <template>
-  <text>message</text>
+  <div class="list">
+    <div class="item row align-center right-arrow">
+      <div class="head">
+        <image class="icon-img-md" src="https://duodu-storage.oss-cn-zhangjiakou.aliyuncs.com/assets/notification.svg" mode="aspectFill"></image>
+        <div class="cu-tag round bg-red sm" v-if="unreadSystemCount">{{unreadSystemCount}}</div>
+      </div>
+      <div class="content">
+        <div class="text-grey"> 通知 </div>
+      </div>
+      <div class="action">
+        <span class="text-grey cuIcon-right"></span>
+      </div>
+    </div>
+    <div class="item row align-center right-arrow" @tap="navigateTo" data-path="message/comment">
+      <div class="head">
+        <image class="icon-img-md" src="https://duodu-storage.oss-cn-zhangjiakou.aliyuncs.com/assets/comment-bg.svg" mode="aspectFill"></image>
+        <div class="cu-tag round bg-red sm" v-if="unreadCommentCount">{{unreadCommentCount}}</div>
+      </div>
+      <div class="content">
+        <div class="text-grey"> 评论 </div>
+      </div>
+      <div class="action">
+        <span class="text-grey cuIcon-right"></span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
   import wepy from '@wepy/core'
+  import { fetchUnreadNotificationsCount } from '../common/notification'
 
   wepy.page({
     data: {
-
+      unreadSystemCount: 0,
+      unreadCommentCount: 0
     },
 
     methods: {
-
+      navigateTo(e) {
+        wepy.wx.navigateTo({url: e.currentTarget.dataset.path});
+      }
     },
     onLoad() {
+      fetchUnreadNotificationsCount().then(res => {
+        this.unreadCommentCount = res.unread_comments
+        this.unreadSystemCount = res.unread_systems
+      }).catch(err =>{
+        console.log(err);
+      })
     }
   });
 </script>
 <config>
   {
-    navigationBarTitleText: '多度找室友',
+    navigationBarTitleText: '通知和消息',
     usingComponents: {
     }
   }

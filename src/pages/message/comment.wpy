@@ -1,0 +1,193 @@
+<style lang="less">
+
+  .label {
+    border: 1px solid #e8e8ee;
+    padding: 2px;
+  }
+  .post-img {
+    width: 60px;
+    height: 60px;
+  }
+
+  textarea {
+    width: 81%;
+    margin-left: 25px;
+    padding: 10px;
+    color: grey;
+    height: 90px;
+    &::before {
+      content: "";
+      width: 0px;
+      height: 0px;
+      border: 0.8em solid transparent;
+      position: absolute;
+      left: -22px;
+      top: 6%;
+      border-right: 10px solid #eee;
+    }
+  }
+
+</style>
+
+<template>
+  <div class="comment-container padding-lr bg-white margin-bottom-sm shadow" v-for="(comment, index) in comments">
+     <div class="row item padding-tb-sm padding-lr-sm bg-white">
+      <div class="avatar-sm">
+        <image :src="comment.user.avatar" mode="aspectFill"></image>
+      </div>
+      <div class="content margin-left-sm flex-sub">
+        <div class="flex text-grey align-center">
+          <div class="flex-sub text-sm">
+            {{comment.user.username}}
+            <span class="text-blue cuIcon-male"></span>
+          </div>
+          <div class="flex-sub text-right">
+            <span class="text-sm radius-sm label radius" :data-username="comment.user.username" :data-id="comment.id" @tap="reply">回复</span>
+          </div>
+        </div>
+
+        <div class="text-gray text-sm flex justify-between align-center">
+          <div class="timestamp">
+            {{comment.tracer}}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="comment text-sm padding-lr-sm padding-tb-sm bg-white">
+      <block v-if="comment.reply">
+        回复
+        <span class="text-darkbrown">
+          @{{comment.reply.username}}
+        </span>
+        :{{comment.body}}
+      </block>
+      <block v-else>
+        {{comment.body}}
+      </block>      
+    </div>
+
+    <div class="padding-lr-sm padding-tb-xs margin-lr-sm bg-gray text-sm" v-if="comment.reply">
+      <span class="text-darkbrown">
+        @{{ comment.reply.username }}:
+      </span>
+      {{ comment.reply.body }}
+      <div class="bg-white margin-tb-xs padding-sm row align-center radius-sm" :data-id="comment.post.id" @tap="showPost">
+        <div style="padding-top: 4px;">
+          <image class="post-img margin-right-sm" mode="aspectFill" :src="comment.post.cover_image || 'https://duodu-storage.oss-cn-zhangjiakou.aliyuncs.com/assets/image-missing.svg' "></image>
+        </div>
+        <div class="column">
+          <span>@{{comment.post.username}}</span>
+          <span class="text-xs text-gray">{{ comment.post.body }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="padding-lr-sm bg-white text-sm radius-sm" v-else>
+      <div class="bg-gray row padding-sm align-center" :data-id="comment.post.id" @tap="showPost">
+        <div style="padding-top: 4px;">
+          <image class="post-img margin-right-sm" mode="aspectFill" :src="comment.post.cover_image || 'https://duodu-storage.oss-cn-zhangjiakou.aliyuncs.com/assets/image-missing.svg' "></image>
+        </div>
+        <div class="column">
+          <span>@{{comment.post.username}}</span>
+          <span class="text-xs text-gray">{{ comment.post.body }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider margin-top"></div>
+  </div>
+
+
+  <div class="cu-modal" :class="{'show': showReplyModal}">
+    <div class="cu-dialog">
+      <form bindsubmit="submitReplyComment">
+        <div class="cu-bar bg-white padding-lr">
+          <div class="text-sm" @tap="cancel">取消</div>
+          <button class="cu-btn sm text-sm radius-sm bg-cyan padding-tb-xs padding-lr-sm" form-type="submit">
+            <span class="iconfont icon-fabu"></span>
+            发送
+          </button>
+        </div>
+        <div class="divider"></div>
+        <div class="flex bg-white text-left padding">
+          <div class="avatar-sm">
+            <open-data type="userAvatarUrl"></open-data>
+          </div>
+          <textarea v-if="showReplyModal" placeholder="回复@{{replyTo}}" fixed="true" name="comment" placeholder-style="color:#ddd;font-size:14px;" class="comment-textarea" maxlength="80" :value="replyMsg" bindinput="commentChange"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script>
+  import wepy from '@wepy/core';
+  import eventHub from '../../common/eventHub';
+  import { fetchComments, replyComment } from '../../common/api';
+
+  wepy.page({
+    data: {
+      comments: [],
+      reply: null,
+      showReplyModal: false,
+      replyCommentId: null,
+      replyTo: null,
+      commentCount: 0,
+    },
+
+    onLoad() {
+      fetchComments().then(res => {
+        this.comments = res.comments
+      })
+    },
+
+    methods: {
+      submitReplyComment(e){
+        let comment = e.$wx.detail.value.comment
+        if (comment.length > 0 && comment.length < 80) {
+          replyComment(this.replyCommentId, comment).then(res => {
+            this.showReplyModal = false;
+            this.replyMsg = '';
+            wx.showToast({
+              title: '发送成功',
+              icon: 'success'
+            });
+            fetchComments().then(res => {
+              this.comments = res.comments
+            })
+          }).catch(err => {
+            wx.showToast({
+              title: '发表评论失败了~ 稍后再发吧!'
+            });
+          });
+        }
+      },
+      cancel(e){        
+        this.showReplyModal = false;
+      },
+      showPost(e) {
+        console.log(e);
+        this.$navigate('/pages/home/postDetail', [e.currentTarget.dataset.id]);
+      },
+      commentChange(e){
+        this.commentCount = e.$wx.detail.value.length;
+      },
+      reply(e){
+        this.replyTo = e.currentTarget.dataset.username;
+        this.replyCommentId = e.currentTarget.dataset.id
+        this.showReplyModal = true
+      },
+    }
+  });
+</script>
+
+<config>
+  {
+    navigationBarTitleText: '',
+    usingComponents: {
+      'grid-list': "~components/gridList"
+    }
+  }
+</config>

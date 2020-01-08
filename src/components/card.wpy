@@ -193,12 +193,7 @@
 
     <div class="flex item padding-lr padding-tb-sm bg-white">
       <div class="avatar margin-top-xs">
-        <block v-if="post.user.avatar">
-          <image :src="post.user.avatar" mode="aspectFill"></image>
-        </block>
-        <block v-else>
-           <open-data  type="userAvatarUrl"></open-data>
-        </block>
+        <image :src="post.user.avatar" mode="aspectFill"></image>
       </div>
       <div class="content margin-left-sm flex-sub">
         <div class="text-grey margin-top-xs" v-if="post.type != 'house_mate'">

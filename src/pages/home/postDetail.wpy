@@ -149,23 +149,13 @@
   <div class="top-screen" style="background-size: cover; background: url('{{imageShow}}') no-repeat center center;">
     <div class="shadow flex padding-lr padding-tb-sm bg-white margin-lr radius">
       <div class="avatar">
-        <block v-if="post.user.avatar">
-          <image :src="post.user.avatar" mode="aspectFill"></image>
-        </block>
-        <block v-else>
-           <open-data  type="userAvatarUrl"></open-data>
-        </block>
+        <image :src="post.user.avatar" mode="aspectFill"></image>        
       </div>
       <div class="content margin-left-sm flex-sub">
         <div class="flex text-grey">
           <div class="flex-sub padding-top-xs">
             <div class="username">
-              <block v-if="post.user.username">
-                {{post.user.username}}
-              </block>
-              <block v-else>
-                 <open-data  type="userNickName"></open-data>
-              </block>
+              {{post.user.username}}
             </div>
             <div class="userinfo text-sm text-gray">
               <div class="age" v-if="post.user.age"> 年龄: {{post.user.age}} </div>
@@ -387,12 +377,7 @@
       </div>
       <div class="post-comment margin-top align-top">
         <div class="avatar-sm">
-          <block v-if="post.user.avatar">
-            <image :src="post.user.avatar" mode="aspectFill"></image>
-          </block>
-          <block v-else>
-             <open-data  type="userAvatarUrl"></open-data>
-          </block>
+          <image :src="post.user.avatar" mode="aspectFill"></image>          
         </div>
         <textarea v-if="!(showSurvey || showReply)" placeholder="发表一个评论吧!" name="comment" placeholder-style="color:gray;font-size:14px;" maxlength="80" :value="comment" class="comment" bindinput="commentChange"/>
       </div>
@@ -449,12 +434,7 @@
         <div class="divider"></div>
         <div class="flex bg-white text-left padding">
           <div class="avatar-sm margin-left-sm">
-            <block v-if="post.user.avatar">
-              <image :src="post.user.avatar" mode="aspectFill"></image>
-            </block>
-            <block v-else>
-               <open-data  type="userAvatarUrl"></open-data>
-            </block>
+            <image :src="post.user.avatar" mode="aspectFill"></image>
           </div>
           <textarea v-if="showReplyModal" placeholder="回复@{{replyTo}}" fixed="true" name="comment" placeholder-style="color:#ddd;font-size:14px;" class="comment-textarea" maxlength="80" :value="replyMsg" bindinput="commentChange"/>
         </div>

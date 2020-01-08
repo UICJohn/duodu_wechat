@@ -21,8 +21,7 @@
 
   .row {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: row;    
   }
 
   .input-group {
@@ -42,12 +41,17 @@
     box-shadow: 0 3px 4px grey;
   }
 
-  .avatar {
+  .avatar, {
     width: 60px;
     height: 60px;
   }
 
-  .avatar image{
+  .icon-img-md {
+    width: 40px;
+    height: 40px;
+  }
+
+  .avatar image,{
     width: 70px;
     height: 70px;
     bottom: 10px;
@@ -73,6 +77,12 @@
     width: 35px;
     height: 35px;
     bottom: 4px;
+  }
+
+  .icon-round {
+    border-radius: 50%;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
   }
 
   .avatar, .avatar-sm, .avatar-xs{
@@ -139,6 +149,7 @@
   import { userMapping } from './common/utils';
   import { authenticate, fetchUser, updateUser } from './common/api';
   import { getLocationByGeo } from './common/map';
+  import { connectCable, subscribe, msgRouter, setNotificationBadge, fetchUnreadNotificationsCount } from './common/notification';
 
   wepy.use(vuex);
   wepy.use(promisify);
@@ -146,19 +157,35 @@
   wepy.app({
 
     data: {
-
+      notificationsCount: 0
     },
 
     onLaunch() {
-      // event hanlder
+      // event hanlder]
       this.regAppEvents();
+      fetchUnreadNotificationsCount().then(res => {
+        this.$options.data.notificationsCount = res.total_unread
+        setNotificationBadge(res.total_unread);
+      }).catch(err =>{
+        eventHub.$emit('wx-error', err);
+      })
     },
 
     methods: {
       regAppEvents(){
+        eventHub.$on('new-notification', (data) => {
+          this.$options.data.notificationsCount += 1;
+          setNotificationBadge(this.$options.data.notificationsCount)
+        });
+
         eventHub.$on('auth-user', () => {
           authenticate().then((res) => {
             wepy.wx.setStorageSync('accessToken', res.header["Authorization"])
+            connectCable().then(res => {
+              eventHub.$emit('channel-connected');
+            }).catch(err => {
+              console.log(err);
+            })
           });
         });
 
@@ -182,6 +209,20 @@
           wepy.wx.openSetting()
         });
 
+        eventHub.$on('channel-connected', (msg) => {
+          wx.onSocketOpen(function() {
+            subscribe('NotificationChannel').then(res => {
+              wx.onSocketMessage(function(res){
+                let data = JSON.parse(res.data);
+                if (data.type != 'ping') {
+                  msgRouter(data);
+                }
+              })
+            }).catch(err => {
+              console.log(err)
+            });
+          })
+        });
       }
     }
 
@@ -192,9 +233,9 @@
 {
   pages: [
     'pages/home',
+    'pages/message',
     'pages/account',
     'pages/nearby',
-    'pages/message',
   ],
   subPackages:[
     {
@@ -208,6 +249,10 @@
     {
       root: 'pages/share/',
       pages: ['authorize']
+    },
+    {
+      root: 'pages/message/',
+      pages: ['comment']
     }
   ],
   window: {

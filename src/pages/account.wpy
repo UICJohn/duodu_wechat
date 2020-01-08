@@ -175,7 +175,7 @@
 
 <config>
   {
-    navigationBarTitleText: '多度找室友',
+    navigationBarTitleText: '账号与设置',
     usingComponents: {
       'grid-list': "~components/gridList"
     }

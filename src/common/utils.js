@@ -114,5 +114,6 @@ module.exports = {
   userMapping: userMapping,
   request: request,
   numberValidator: numberValidator,
-  stringToBoolean: stringToBoolean 
+  stringToBoolean: stringToBoolean,
+  requestHeader: requestHeader
 }

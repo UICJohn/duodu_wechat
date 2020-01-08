@@ -27,8 +27,7 @@ const sendCode = (data) => {
     request({
       url: BASE_URL + "/v1/verification_code",
       method:'POST',
-      data: data,
-      header: header
+      data: data
     }).then((res) => {
       resolve(res);
     })
@@ -40,8 +39,7 @@ const updateEmail = (data) => {
     request({
       url: BASE_URL + "/v1/profiles/update_email",
       method: 'PUT',
-      data: data,
-      header: header
+      data: data
     }).then(res => {
       resolve(res);
     })
@@ -53,8 +51,7 @@ const fetchSuburbs = (region) => {
     request({
       url: BASE_URL + "/v1/suburbs",
       method: 'GET',
-      data: {region: region},
-      header: header
+      data: {region: region}
     }).then(res => {
       resolve(res.data.suburbs)
     })
@@ -66,8 +63,7 @@ const updatePhone = (data) => {
     request({
       url: BASE_URL + "/v1/profiles/update_phone",
       method: 'PUT',
-      data: data,
-      header: header
+      data: data
     }).then(res => {$
       resolve(res);
     })
@@ -80,8 +76,7 @@ const uploadPostImage = (post_id, image_path, data={}) => {
       url: BASE_URL + "/v1/posts/" + post_id + "/upload_images",
       filePath: image_path,
       name: 'attachment',
-      formData: data,
-      header: header
+      formData: data
     }).then(res => {
       resolve(res)
     }).catch(err => {
@@ -265,6 +260,19 @@ const sendSurvey = (data) => {
   })
 }
 
+const fetchComments = () =>{
+  return new Promise((resolve, reject) => {
+    request({
+      url: BASE_URL +'/v1/comments',
+      method: 'GET'
+    }).then(res => {
+      resolve(res.data)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
 module.exports = {
   authenticate: authenticate,
   createPost: createPost,
@@ -283,5 +291,6 @@ module.exports = {
   postComment: postComment,
   replyComment: replyComment,
   fetchSurvey: fetchSurvey,
-  sendSurvey: sendSurvey
+  sendSurvey: sendSurvey,
+  fetchComments: fetchComments
 }
