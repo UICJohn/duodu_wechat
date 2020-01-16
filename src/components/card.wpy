@@ -4,6 +4,11 @@
   @import "~assets/css/icon.wxss";
   @import "~assets/css/iconfont.wxss";
 
+
+  .card:first-child {
+    margin-top: 50px;
+  }
+
   .column {
     display: flex;
     flex-direction: column;

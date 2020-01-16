@@ -31,7 +31,6 @@
 
 </style>
 
-
 <wxs module="m" lang="babel">
   const locationMarker = (post) => {
     return [{
@@ -58,7 +57,7 @@
 </wxs>
 
 <template>  
-  <div class="flex align-center top padding-sm" :style="{position: 'sticky', top: 0, zIndex: 999}" >
+  <div class="flex align-center top padding-sm" :style="{position: 'fixed', top: 0, zIndex: 999}" >
     <div class="row margin-sm" @tap="navigateTo" data-path="home/cities">
       <text class="text-sm"> {{location.city}} </text>
       <span class="cuIcon-unfold" :style="{paddingTop: '5rpx', marginLeft: '2rpx'}" />
@@ -80,7 +79,7 @@
     <text class="text-sm">筛选</text>
   </button>
 
-  <scroll-view class="content">
+  <div class="content">
     <block v-for="post in posts" v-key="post.id">
       <card 
         :post="post" 
@@ -89,7 +88,7 @@
         clickEvent="showDetail"
       />
     </block>
-  </scroll-view>
+  </div>
 
   <modal :show.sync="showModal" :title="modalInfo.title" :body="modalInfo.body" :confirmEvent="modalInfo.confirmEvent" />
 
@@ -164,11 +163,10 @@
       showModal: false,
       postModal: false,
       modalInfo: {},
+      page: 1,
       posts:[],
       filterType: 'area',
-      filters: {
-        page: 0
-      },
+      filters: {},
       setFilter: false,
     },
     methods: {
@@ -217,6 +215,7 @@
           this.postModal = false;
         })
       },
+
       regEvents(){
         eventHub.$on('modal-confirm', ()=>{
           this.showModal = false;
@@ -244,12 +243,27 @@
           }
           fetchPosts(this.filters).then(posts => {
             this.posts = posts
+            wx.stopPullDownRefresh()
           })
         });
         eventHub.$on('close-filters', (refresh) => {
           this.setFilter = false
         });
       }
+    },
+
+    onPullDownRefresh () {
+      eventHub.$emit('refresh');
+    },
+
+    onReachBottom() {
+      let _this = this
+      fetchPosts(this.filters, this.page + 1).then(posts => {
+        if(posts.length > 0) {
+          _this.posts = _this.posts.concat(posts)
+          _this.page += 1
+        }
+      })
     },
 
     onLoad() {

@@ -144,11 +144,12 @@ const createPost = (data) => {
   })
 }
 
-const fetchPosts = (filters = {}) => {
+const fetchPosts = (filters = {}, page=1) => {
   return new Promise((resolve, reject) => {
     request({
       url: BASE_URL + '/v1/posts',
-      method: 'GET'
+      method: 'GET',
+      data: { filters: filters, page: page}
     }).then(res => {
       resolve(res.data.posts);
     }).catch(err => {
