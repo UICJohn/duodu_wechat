@@ -6,7 +6,7 @@ const MAXRETRY = 3;
 const fetchTokenHeader = () =>{
   let data = wx.getStorageSync('accessToken')
   if (!data){
-    eventHub.$emit('auth-user', err);
+    eventHub.$emit('auth-user');
     return false
   }
   return data
@@ -98,6 +98,17 @@ const errorHanlder = (res) => {
   })
 }
 
+const formatNumber = (n) => {
+  n = n.toString()
+  return n[1] ? n : '0' + n
+}
+
+const formatTime = (date = new Date()) => { 
+ var hour = date.getHours()
+ var minute = date.getMinutes()
+ return [hour, minute].map(formatNumber).join(':')
+}
+
 const userMapping = (userInfo) => {
   if (userInfo && userInfo.nickName) {
     let user_info = {
@@ -115,5 +126,6 @@ module.exports = {
   request: request,
   numberValidator: numberValidator,
   stringToBoolean: stringToBoolean,
-  requestHeader: requestHeader
+  requestHeader: requestHeader,
+  formatTime: formatTime
 }

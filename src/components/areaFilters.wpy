@@ -38,7 +38,7 @@
 <template>
   <div class="flex">
     <div class="vertical-nav nav bg-gray solid-right" scroll-y scroll-with-animation scroll-top="{{VerticalNavTop}}" style="height:calc(100vh - 500rpx); width: 150px">
-      <div class="solid-bottom cu-item {{index==selectedTab?'text-blue cur':''}}" v-for="(item, index) in tabs" wx:key @tap="selectedTab=index" data-id="{{index}}">
+      <div class="solid-bottom cu-item {{index==selectedTab?'text-blue cur':''}}" v-for="(item, index) in tabs" wx:key="index" @tap="selectedTab=index" data-id="{{index}}">
         {{item.name}}
       </div>
     </div>

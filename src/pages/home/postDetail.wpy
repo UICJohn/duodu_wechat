@@ -166,7 +166,7 @@
             </div>
           </div>
           <div class="flex-sub margin-top user-action text-right text-black">
-            <span class="iconfont icon-message margin-right-sm text-lg" style="font-size: 22px;"></span>
+            <span class="iconfont icon-message margin-right-sm text-lg" style="font-size: 22px;" @tap="openChat"></span>
             <span class="cuIcon-phone text-lg" @tap="makeCall"></span>
           </div>
         </div>
@@ -177,7 +177,7 @@
   <div class="shadow padding-lr padding-tb-sm bg-white">    
     <div class="top flex">
       <div class="flex-sub">
-        <div class="row text-black text-lg align-center">
+        <div class="row text-black text-lg align-center text-cut">
           <span>{{post.title}}</span>
           <span class="label text-white bg-blue text-xs margin-left-xs padding-sm radius-sm">
             {{ post.type == 'Post::TakeHouse' ?  '整租' : (post.type == 'house_mate' ? '找室友' : '分租')}}
@@ -478,6 +478,8 @@
 <script>
   import wepy from '@wepy/core';
   import { likePost, fetchPost, postComment, replyComment, fetchSurvey, sendSurvey} from '../../common/api';
+  import { fetchRoomId } from '../../common/actioncable';
+  import eventHub from '../../common/eventHub';
 
   wepy.page({
 
@@ -499,6 +501,20 @@
     },
 
     methods: {
+      openChat(e) {
+        let _this = this
+        fetchRoomId(this.post.user.id).then(room => {
+          if (room.id) {
+            console.log(room)
+            _this.$navigate("/pages/message/chat", { roomId: room.id });
+          } else {
+            eventHub.$emit('wx-error', {errors: 'No room id provided', page: 'Post detail page'})  
+          }
+        }).catch(err => {
+          eventHub.$emit('wx-error', err)
+        })
+      },
+
       clickLike(e) {
         let id = e.currentTarget.dataset.post
         likePost(id, !this.like).then( res => {
@@ -530,7 +546,6 @@
               title: '发送成功',
               icon: 'success'
             });
-            console.log(res);
             this.comments = res.data.comments
           }).catch(err => {
             wx.showToast({
@@ -623,7 +638,8 @@
     },
 
     onLoad(params) {
-      fetchPost(params[0]).then(post => {
+      // fetchPost(params[0]).then(post => {
+      fetchPost(3).then(post => {
         console.log(post);
         this.post = post
         this.like = this.post.like

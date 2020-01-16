@@ -1,0 +1,171 @@
+<!-- wx.getSystemInfoSync().windowHeight -->
+<style lang="less">
+  .cu-chat:last-child {
+    margin-bottom: 70px;
+  }
+
+  .tag-divider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:before {
+      content: "";
+      display: block;
+      border-bottom: 1px solid #E8E8EE;
+      z-index: 0;
+      width: 35%;
+    }
+
+    &:after {
+      content: "";
+      display: block;
+      border-bottom: 1px solid #E8E8EE;
+      z-index: 0;
+      width: 35%;
+    }
+  }
+
+  .cu-bar.input {
+    padding-right: 0;
+    background-color: #f0f0f0;
+  }
+</style>
+
+<template>  
+  <div class="message-container">
+    <div class="tag-divider margin-top-sm text-sm text-gray" v-if="noPrevMessage">呀~没有更多消息了~</div>
+    <div class="cu-chat" v-for="(message, index) in messages" v-key="message.id" id="message-{{index}}">
+      <div class="cu-item" :class="{self: (message.user.id == currentUser.id)}" >
+        <div class="cu-avatar radius" style="background-image:url({{message.user.avatar}});" v-if="!(message.user.id == currentUser.id)"></div>
+        <div class="main">
+          <div class="content bg-green shadow">
+            <text>{{message.body}}</text>
+          </div>
+        </div>
+        <div class="cu-avatar radius" style="background-image:url({{message.user.avatar}});" v-if="message.user.id == currentUser.id"></div>
+        <div class="date">{{message.tracer}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cu-bar foot input {{InputBottom!=0?'cur':''}}">
+    <input class="bg-white padding-lr-sm" :value="message" bindinput="setMessage" focus="{{false}}" maxlength="300" cursor-spacing="10"/>
+    <button class="cu-btn bg-green shadow margin-right-sm" @tap="sendNewMessage">发送</button>
+  </div>
+</template>
+
+<script>
+  import wepy from '@wepy/core';
+  import eventHub from '../../common/eventHub';
+  import { fetchMessages, sendMessage } from '../../common/actioncable';
+  import { formatTime } from '../../common/utils'
+
+  wepy.page({
+
+    data: {
+      roomId: null,
+      messages: [],
+      InputBottom: 0,
+      message: null,
+      currentUser: null,
+      page: null,
+      noPrevMessage: false
+    },
+
+    methods: {
+
+      setMessage(e){
+        this.message = e.$wx.detail.value.trim()
+        this.messageType = (this.message && this.message != '') ? 'text' : 'other'
+      },
+
+      sendNewMessage(e){
+        if (this.message && this.message != '') {
+          let _this = this
+          sendMessage({
+            room_id: this.roomId,
+            body: this.message
+          }, 'send_message').then(res =>{
+            let date = new Date()
+            _this.messages = _this.messages.concat({
+              body: _this.message,
+              user: _this.currentUser,
+              tracer: formatTime()
+            })
+            _this.message = null
+            eventHub.$emit('scroll-bottom')
+          }).catch(err => {
+            eventHub.$emit('wx-error', err);
+          })
+        }
+      },
+
+      eventReg(e) {
+        eventHub.$on('scroll-bottom', () => {
+          let _this = this
+          setTimeout(function(){
+            wx.pageScrollTo({
+              duration: 300,
+              selector: '#message-' + (_this.messages.length - 1),
+            })
+          }, 400);
+        })
+
+        eventHub.$on('new-message', (data) => {
+          console.log(data);
+          if (data.room_id === this.roomId) {
+            this.messages = this.messages.concat({
+              body: data.body,
+              tracer: data.tracer,
+              user: data.user
+            })
+            eventHub.$emit('scroll-bottom')
+          }
+        })
+      }
+    },
+
+    onPullDownRefresh () {
+      let _this = this;
+      fetchMessages(this.roomId, this.page + 1).then(data => {
+        if(data.messages.length > 0) {
+          _this.messages = data.messages.concat(_this.messages);
+          _this.page = _this.page + 1
+        } else {
+          _this.noPrevMessage = true
+        }
+        wx.stopPullDownRefresh()
+      }).catch(err => {
+        eventHub.$emit('wx-error', err);
+      })
+    },
+
+    onReady(){
+      eventHub.$emit('scroll-bottom')
+    },
+
+    onLoad(params){
+      //!important change room id
+      this.roomId = params.roomId;
+      this.eventReg();
+      fetchMessages(this.roomId).then(data => {
+        console.log(data.messages)
+        this.currentUser = data.current_user
+        this.messages = data.messages
+        this.page = data.page
+      }).catch(err => {
+        eventHub.$emit('wx-error', err);
+      })
+    }
+  });
+</script>
+
+<config>
+  {
+    navigationBarTitleText: '聊天',
+    usingComponents: {
+
+    }
+  }
+</config>

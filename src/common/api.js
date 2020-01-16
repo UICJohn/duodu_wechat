@@ -1,4 +1,4 @@
-import { request } from './utils'
+import { request, requestHeader } from './utils'
 import eventHub from './eventHub';
 import wepy from '@wepy/core';
 
@@ -64,7 +64,7 @@ const updatePhone = (data) => {
       url: BASE_URL + "/v1/profiles/update_phone",
       method: 'PUT',
       data: data
-    }).then(res => {$
+    }).then(res => {
       resolve(res);
     })
   })
@@ -72,15 +72,18 @@ const updatePhone = (data) => {
 
 const uploadPostImage = (post_id, image_path, data={}) => {
   return new Promise((resolve, reject) => { 
-    wepy.wx.uploadFile({
-      url: BASE_URL + "/v1/posts/" + post_id + "/upload_images",
-      filePath: image_path,
-      name: 'attachment',
-      formData: data
-    }).then(res => {
-      resolve(res)
-    }).catch(err => {
-      reject(err)
+    requestHeader().then(headers => {
+      wepy.wx.uploadFile({
+        url: BASE_URL + "/v1/posts/" + post_id + "/upload_images",
+        filePath: image_path,
+        name: 'attachment',
+        header: headers,
+        formData: data
+      }).then(res => {
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })
     })
   })
 }
