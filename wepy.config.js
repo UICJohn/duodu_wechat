@@ -1,3 +1,4 @@
+
 const path = require('path');
 var prod = process.env.NODE_ENV === 'production';
 var staging = process.env.NODE_ENV === 'staging';
@@ -33,10 +34,16 @@ module.exports = {
     }
   },
   static: "/assets",
+  // plugins: [
+  //   definePlugin({
+  //     BASE_URL: JSON.stringify(staging ? 'http://47.92.125.75' : 'http://192.168.31.224:3000'),
+  //     SOCKET_URL: JSON.stringify(staging ? 'ws://47.92.125.75/cable' : 'ws://192.168.31.224:3000/cable'),
+  //   })
+  // ],
   plugins: [
     definePlugin({
-      BASE_URL: JSON.stringify(staging ? 'http://47.92.125.75' : 'http://192.168.31.224:3000'),
-      SOCKET_URL: JSON.stringify(staging ? 'ws://47.92.125.75/cable' : 'ws://192.168.31.224:3000/cable'),
+      BASE_URL: JSON.stringify(staging ? 'http://47.92.125.75' : 'http://192.168.1.32:3000'),
+      SOCKET_URL: JSON.stringify(staging ? 'ws://47.92.125.75/cable' : 'ws://192.168.1.32:3000/cable'),
     })
   ],
   appConfig: {

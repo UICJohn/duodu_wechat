@@ -50,7 +50,7 @@
   </div>
 
   <div class="cu-bar foot input {{InputBottom!=0?'cur':''}}">
-    <input class="bg-white padding-lr-sm" :value="message" bindinput="setMessage" focus="{{false}}" maxlength="300" cursor-spacing="10"/>
+    <input class="bg-white padding-lr-sm" :value="message" bindinput="setMessage" focus="{{true}}" hold-keyboard="{{true}}" maxlength="300" cursor-spacing="10"/>
     <button class="cu-btn bg-green shadow margin-right-sm" @tap="sendNewMessage">发送</button>
   </div>
 </template>
@@ -114,7 +114,8 @@
 
         eventHub.$on('new-message', (data) => {
           console.log(data);
-          if (data.room_id === this.roomId) {
+          console.log(this.roomId)
+          if (data.room_id == this.roomId) {
             this.messages = this.messages.concat({
               body: data.body,
               tracer: data.tracer,
@@ -150,10 +151,13 @@
       this.roomId = params.roomId;
       this.eventReg();
       fetchMessages(this.roomId).then(data => {
-        console.log(data.messages)
         this.currentUser = data.current_user
+        console.log(this.current_user)
         this.messages = data.messages
         this.page = data.page
+        if(this.messages.length == 0){
+          this.noPrevMessage = true
+        }
       }).catch(err => {
         eventHub.$emit('wx-error', err);
       })
@@ -164,8 +168,5 @@
 <config>
   {
     navigationBarTitleText: '聊天',
-    usingComponents: {
-
-    }
   }
 </config>

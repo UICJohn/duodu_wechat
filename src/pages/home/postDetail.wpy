@@ -165,9 +165,25 @@
               </div>
             </div>
           </div>
-          <div class="flex-sub margin-top user-action text-right text-black">
-            <span class="iconfont icon-message margin-right-sm text-lg" style="font-size: 22px;" @tap="openChat"></span>
-            <span class="cuIcon-phone text-lg" @tap="makeCall"></span>
+          <div class="flex-sub column margin-top user-action text-right text-black">
+            <div>
+              <span class="iconfont icon-message margin-right-sm text-lg" style="font-size: 22px;" @tap="openChat"></span>
+              <span class="cuIcon-phone text-lg" @tap="makeCall"></span>
+            </div>
+            <div>
+              <span class="label text-white bg-blue text-xs margin-left-xs padding-sm radius-sm">
+                {{ post.type == 'Post::TakeHouse' ?  '整租' : (post.type == 'house_mate' ? '找室友' : '分租')}}
+              </span>
+              <span class="label text-grey text-xs margin-left-xs" v-if="post.type != 'house_mate'">
+                ￥{{post.rent}}/月
+              </span>
+
+              <span class="label text-grey text-xs margin-left-xs" v-else>
+                <block v-if="post.max_rent || post.min_rent">
+                  ￥{{post.min_rent ? (post.min_rent + '-') : ''}}{{post.max_rent ? post.max_rent : '不限'}}/月
+                </block>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -179,18 +195,6 @@
       <div class="flex-sub">
         <div class="row text-black text-lg align-center text-cut">
           <span>{{post.title}}</span>
-          <span class="label text-white bg-blue text-xs margin-left-xs padding-sm radius-sm">
-            {{ post.type == 'Post::TakeHouse' ?  '整租' : (post.type == 'house_mate' ? '找室友' : '分租')}}
-          </span>
-          <span class="label text-grey text-xs margin-left-xs" v-if="post.type != 'house_mate'">
-            ￥{{post.rent}}/月
-          </span>
-
-          <span class="label text-grey text-xs margin-left-xs" v-else>
-            <block v-if="post.max_rent || post.min_rent">
-              ￥{{post.min_rent ? (post.min_rent + '-') : ''}}{{post.max_rent ? post.max_rent : '不限'}}/月
-            </block>
-          </span>
         </div>
         <span class="text-xs text-gray"> {{post.timestamp}} </span>
       </div>
@@ -342,6 +346,10 @@
 
   <div class="divider" style="width: 100%;"></div>
 
+  <div class="bar padding-left padding-tb-sm bg-white">
+    <span class="text-sm text-gray" v-if="post.type == 'house_mate' ">求租区域</span>
+    <span class="text-sm text-gray" v-else="房源地点">求租区域</span>
+  </div>
   <div class="map-sm bg-white">
     <div class="map-cover" @tap="getRouter"></div>
     <map id="myMap"
@@ -638,8 +646,7 @@
     },
 
     onLoad(params) {
-      // fetchPost(params[0]).then(post => {
-      fetchPost(3).then(post => {
+      fetchPost(params[0]).then(post => {
         console.log(post);
         this.post = post
         this.like = this.post.like

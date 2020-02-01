@@ -68,10 +68,6 @@ const setNotificationBadge = (count) => {
   } else {
     wx.setTabBarBadge({ index: 2, text: String(count) });
   }
-  // if (count < 10) {
-  // } else {
-  //   wx.showTabBarRedDot({ index: 2 });
-  // }
 }
 
 const removeNotificationBadge = () => {
@@ -83,7 +79,7 @@ const fetchRoomId = (messageTo) => {
     request({
       url: BASE_URL + '/v1/chat_room/fetch_room',
       data: { message_to: messageTo },
-      method: 'GET'      
+      method: 'GET'
     }).then(res => {
       resolve(res.data.room)
     }).catch(err => {
@@ -97,7 +93,7 @@ const fetchMessages = (roomId, page = 1) => {
     request({
       url: BASE_URL + '/v1/messages',
       data: { room_id: roomId, page: page },
-      method: 'GET'      
+      method: 'GET'
     }).then(res => {
       resolve(res.data)
     }).catch(err => {

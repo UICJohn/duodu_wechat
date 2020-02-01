@@ -161,7 +161,7 @@
           show-location>
         </map>
       </block>
-      <div class="price-tag padding-lr-sm" v-if="post.available_from">
+      <div class="price-tag padding-lr-sm" v-if="post.type != 'house_mate'">
         <div class="title text-cut">
           {{post.title}}
         </div>
