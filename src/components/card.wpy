@@ -141,7 +141,7 @@
 
 <template>
   <div class="card margin-tb margin-lr">
-    <div class="cu-tag bg-{{m.tagColor(post.type)}}" style="border-top-right-radius: 10px; border-top-left-radius: 10px;">
+    <div class="bg-{{m.tagColor(post.type)}} text-sm text-center text-white" style="border-top-right-radius: 10px; border-top-left-radius: 10px;">
       {{m.tag(post.type)}}
     </div>
     <div class="cover-img item">

@@ -30,6 +30,7 @@
 </style>
 
 <template>
+  <div class="tag-divider margin-top-sm text-sm text-gray" v-if="!comments">暂无评论</div>
   <div class="comment-container padding-lr bg-white margin-bottom-sm shadow" v-for="(comment, index) in comments">
      <div class="row item padding-tb-sm padding-lr-sm bg-white">
       <div class="avatar-sm">
@@ -98,7 +99,6 @@
 
     <div class="divider margin-top"></div>
   </div>
-
 
   <div class="cu-modal" :class="{'show': showReplyModal}">
     <div class="cu-dialog">

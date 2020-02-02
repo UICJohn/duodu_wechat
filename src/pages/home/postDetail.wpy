@@ -511,15 +511,25 @@
     methods: {
       openChat(e) {
         let _this = this
-        fetchRoomId(this.post.user.id).then(room => {
-          if (room.id) {
-            console.log(room)
-            _this.$navigate("/pages/message/chat", { roomId: room.id });
-          } else {
-            eventHub.$emit('wx-error', {errors: 'No room id provided', page: 'Post detail page'})  
+        wx.getSetting({
+          success(res) {
+            if(!res.authSetting["scope.userInfo"]) {
+              _this.$navigate('share/authorize')
+            }else {
+              fetchRoomId(_this.post.user.id).then(room => {
+                if (room.id) {
+                  _this.$navigate("/pages/message/chat", { roomId: room.id });
+                } else {
+                  eventHub.$emit('wx-error', {errors: 'No room id provided', page: 'Post detail page'})
+                }
+              }).catch(err => {
+                eventHub.$emit('wx-error', err)
+              })
+            }
+          },
+          fail(err){
+            eventHub.$emit('wx-error', err);
           }
-        }).catch(err => {
-          eventHub.$emit('wx-error', err)
         })
       },
 

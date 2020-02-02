@@ -152,12 +152,17 @@
       this.eventReg();
       fetchMessages(this.roomId).then(data => {
         this.currentUser = data.current_user
-        console.log(this.current_user)
         this.messages = data.messages
         this.page = data.page
         if(this.messages.length == 0){
           this.noPrevMessage = true
         }
+
+        console.log(data.room.title);
+
+        wx.setNavigationBarTitle({
+          title: data.room.title
+        })
       }).catch(err => {
         eventHub.$emit('wx-error', err);
       })
